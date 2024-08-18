@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "./start-dev.sh",
+    "dev": "start-dev.bat",
     "vercel-dev": "nodemon --watch pages --watch components --exec \"next dev\"",
     "build": "next build",
     "start": "next start",

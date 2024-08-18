@@ -168,6 +168,7 @@ export function ChatInterface() {
       human_say: userMessage,
       stream,
     };
+    console.log('Request Data:', requestData);
     setIsBotTyping(true); // Start showing the typing indicator
 
     try {
@@ -185,6 +186,8 @@ export function ChatInterface() {
         headers: headers,
         body: JSON.stringify(requestData),
       });
+
+      console.log('Response Status:', response.status);
   
       if (!response.ok) {
         throw new Error(`Network response was not ok: ${response.statusText}`);
