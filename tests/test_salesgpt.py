@@ -42,7 +42,7 @@ class TestSalesGPT:
         if use_mock_api:
             self.api_key = None  # Force the use of mock API by unsetting the API key
 
-        llm = ChatLiteLLM(temperature=0.9, model="gpt-4-0125-preview")
+        llm = ChatLiteLLM(temperature=0.9, model="gpt-4o-mini")
 
         sales_agent = SalesGPT.from_llm(
             llm,
@@ -214,7 +214,7 @@ class TestSalesGPT:
     @pytest.mark.asyncio
     async def test_valid_async_inference_stream(self, load_env):
         llm = ChatLiteLLM(temperature=0.9)
-        model_name = "gpt-3.5-turbo"
+        model_name = "gpt-4o-mini"
 
         sales_agent = SalesGPT.from_llm(
             llm,

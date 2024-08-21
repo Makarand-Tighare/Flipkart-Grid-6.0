@@ -65,7 +65,7 @@ class SalesGPT(Chain):
     sales_conversation_utterance_chain: SalesConversationChain = Field(...)
     conversation_stage_dict: Dict = CONVERSATION_STAGES
 
-    model_name: str = "gpt-3.5-turbo-0613"  # TODO - make this an env variable
+    model_name: str = "gpt-4o-mini-0613"  # TODO - make this an env variable
 
     use_tools: bool = False
     salesperson_name: str = "Ted Lasso"

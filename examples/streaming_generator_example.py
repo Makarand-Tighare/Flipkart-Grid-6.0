@@ -7,7 +7,7 @@ from salesgpt.agents import SalesGPT
 
 load_dotenv()
 
-llm = ChatLiteLLM(temperature=0.9, model_name="gpt-3.5-turbo-0613")
+llm = ChatLiteLLM(temperature=0.9, model_name="gpt-4o-mini-0613")
 
 sales_agent = SalesGPT.from_llm(
     llm,

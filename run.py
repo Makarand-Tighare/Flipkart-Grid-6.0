@@ -50,7 +50,7 @@ if __name__ == "__main__":
     verbose = args.verbose
     max_num_turns = args.max_num_turns
 
-    llm = ChatLiteLLM(temperature=0.2, model_name="gpt-3.5-turbo")
+    llm = ChatLiteLLM(temperature=0.2, model_name="gpt-4o-mini")
 
     if config_path == "":
         print("No agent config specified, using a standard config")
