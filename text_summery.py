@@ -1,3 +1,10 @@
+from transformers import pipeline
+
+# Initialize the summarization pipeline
+summarizer = pipeline("summarization", model="Falconsai/text_summarization")
+
+# Your text to summarize
+text = """
 Product Name 0: Men Printed Hooded Neck Cotton Blend Black T-Shirt
 Product Url: https://www.flipkart.com/tripr-printed-men-hooded-neck-black-t-shirt/p/itm6799db09c2b82?pid=TSHGY9TCUZFGKHGA&lid=LSTTSHGY9TCUZFGKHGA5LE6SP&marketplace=FLIPKART&store=clo%2Fash%2Fank%2Fedy&srno=b_1_1&otracker=browse&fm=organic&iid=en_DqVmAVZp9JcOZ12w0LyUwrKNi5sUGGs1z5z_MLmpdhsn8nVWJDJW7QfdyfevQuxKbX7Lh8GuD2DdkJ9ZbkETFPUFjCTyOHoHZs-Z5_PS_w0%3D&ppt=None&ppn=None&ssid=hf14v6qij40000001724248641965
 Price: $322
@@ -68,3 +75,10 @@ Original Price: ₹699
 Discount: 71 
 Rating: None
 
+"""
+
+# Summarize the text
+summary = summarizer(text)
+
+# Print the summary
+print(summary[0]['summary_text'])

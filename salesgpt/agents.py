@@ -70,11 +70,12 @@ class SalesGPT(Chain):
     use_tools: bool = False
     salesperson_name: str = "Ted Lasso"
     salesperson_role: str = "Business Development Representative"
-    company_name: str = "Sleep Haven"
-    company_business: str = "Sleep Haven is a premium mattress company that provides customers with the most comfortable and supportive sleeping experience possible. We offer a range of high-quality mattresses, pillows, and bedding accessories that are designed to meet the unique needs of our customers."
-    company_values: str = "Our mission at Sleep Haven is to help people achieve a better night's sleep by providing them with the best possible sleep solutions. We believe that quality sleep is essential to overall health and well-being, and we are committed to helping our customers achieve optimal sleep by offering exceptional products and customer service."
-    conversation_purpose: str = "find out whether they are looking to achieve better sleep via buying a premier mattress."
+    company_name: str = "Flipkart"
+    company_business: str = "Flipkart is a leading e-commerce platform in India, offering a wide range of products including electronics, fashion, home essentials, groceries, and lifestyle products. We are committed to providing our customers with the best online shopping experience by offering high-quality products, competitive prices, and exceptional customer service."
+    company_values: str = "At Flipkart, our mission is to enhance the lives of our customers by offering a seamless online shopping experience with a focus on convenience, variety, and value. We believe in putting the customer first and strive to innovate and adapt to meet their needs."
+    conversation_purpose: str = "understand the prospect's needs and explore how Flipkart's products can meet those needs."
     conversation_type: str = "call"
+
 
     def retrieve_conversation_stage(self, key):
         """

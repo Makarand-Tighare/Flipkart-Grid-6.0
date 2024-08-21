@@ -1,36 +1,35 @@
 import os
-
 from dotenv import load_dotenv
 from langchain_community.chat_models import ChatLiteLLM
-
 from salesgpt.agents import SalesGPT
 
+# Load environment variables
 load_dotenv()
 
+# Initialize the language model with desired settings
 llm = ChatLiteLLM(temperature=0.9, model_name="gpt-3.5-turbo-0613")
 
+# Create the SalesGPT agent with Flipkart-specific information
 sales_agent = SalesGPT.from_llm(
     llm,
     verbose=False,
     salesperson_name="Ted Lasso",
-    salesperson_role="Sales Representative",
-    company_name="Sleep Haven",
-    company_business="""Sleep Haven 
-                            is a premium mattress company that provides
-                            customers with the most comfortable and
-                            supportive sleeping experience possible. 
-                            We offer a range of high-quality mattresses,
-                            pillows, and bedding accessories 
-                            that are designed to meet the unique 
-                            needs of our customers.""",
+    salesperson_role="Business Development Representative",
+    company_name="Flipkart",
+    company_business="""Flipkart is a leading e-commerce platform in India, 
+                        offering a wide range of products including electronics, 
+                        fashion, home essentials, groceries, and lifestyle products. 
+                        We are committed to providing our customers with the best 
+                        online shopping experience by offering high-quality products, 
+                        competitive prices, and exceptional customer service.""",
 )
 
+# Initialize the agent
 sales_agent.seed_agent()
 
-# get generator of the LLM output
+# Get a generator for the LLM output, streaming responses
 generator = sales_agent.step(stream=True)
 
-# operate on streaming LLM output in near-real time
-# for instance, do something after each full sentence is generated
+# Process the streaming LLM output in near-real time
 for chunk in generator:
     print(chunk)
