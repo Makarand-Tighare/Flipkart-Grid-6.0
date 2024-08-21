@@ -180,7 +180,7 @@ export function ChatInterface() {
         console.log('Authorization Key:', process.env.NEXT_PUBLIC_AUTH_KEY); // Add this line
         headers['Authorization'] = `Bearer ${process.env.NEXT_PUBLIC_AUTH_KEY}`;
       }
-
+      
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat`, {
         method: 'POST',
         headers: headers,
