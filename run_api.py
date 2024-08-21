@@ -16,13 +16,9 @@ load_dotenv()
 
 # Access environment variables
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
-CORS_ORIGINS = ["http://localhost:3000", 
-                "http://localhost:8000", 
-                "http://react-frontend:80",
-                "https://sales-gpt-frontend-git-main-filip-odysseypartns-projects.vercel.app",
-                "https://sales-gpt-frontend.vercel.app",
-                "chrome-extension://objokajddmimndmgfmpnaklnfkmkjieg"]
-                
+
+CORS_ORIGINS = ["*"]
+
 CORS_METHODS = ["GET", "POST"]
 
 # Initialize FastAPI app
@@ -73,7 +69,7 @@ async def get_bot_name(authorization: Optional[str] = Header(None)):
             "PRODUCT_CATALOG", "examples/sample_product_catalog.txt"
         ),
         verbose=True,
-        model_name=os.getenv("GPT_MODEL", "gpt-3.5-turbo"),
+        model_name=os.getenv("GPT_MODEL", "gpt-4o-mini"),
     )
     name = sales_api.sales_agent.salesperson_name
     return {"name": name, "model": sales_api.sales_agent.model_name}
@@ -113,7 +109,7 @@ async def chat_with_sales_agent(req: MessageList, stream: bool = Query(False), a
             product_catalog=os.getenv(
                 "PRODUCT_CATALOG", "examples/sample_product_catalog.txt"
             ),
-            model_name=os.getenv("GPT_MODEL", "gpt-3.5-turbo"),
+            model_name=os.getenv("GPT_MODEL", "gpt-4o-mini"),
             use_tools=os.getenv("USE_TOOLS_IN_API", "True").lower()
             in ["true", "1", "t"],
         )

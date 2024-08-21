@@ -15,7 +15,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 def setup_knowledge_base(
-    product_catalog: str = None, model_name: str = "gpt-3.5-turbo"
+    product_catalog: str = None, model_name: str = "gpt-4o-mini"
 ):
     """
     We assume that the product catalog is simply a text string.
@@ -27,7 +27,7 @@ def setup_knowledge_base(
     text_splitter = CharacterTextSplitter(chunk_size=5000, chunk_overlap=200)
     texts = text_splitter.split_text(product_catalog)
 
-    llm = ChatOpenAI(model_name="gpt-4-0125-preview", temperature=0)
+    llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
 
     embeddings = OpenAIEmbeddings()
     docsearch = Chroma.from_texts(
@@ -101,7 +101,7 @@ def get_product_id_from_query(query, product_price_id_mapping_path):
     Return a valid directly parsable json, dont return in it within a code snippet or add any kind of explanation!!
     """
     prompt += "{"
-    model_name = os.getenv("GPT_MODEL", "gpt-3.5-turbo-1106")
+    model_name = os.getenv("GPT_MODEL", "gpt-4o-mini-1106")
 
     if "anthropic" in model_name:
         response = completion_bedrock(
@@ -163,7 +163,7 @@ def get_mail_body_subject_from_query(query):
     Now, based on the provided query, return the structured information as described.
     Return a valid directly parsable json, dont return in it within a code snippet or add any kind of explanation!!
     """
-    model_name = os.getenv("GPT_MODEL", "gpt-3.5-turbo-1106")
+    model_name = os.getenv("GPT_MODEL", "gpt-4o-mini-1106")
 
     if "anthropic" in model_name:
         response = completion_bedrock(

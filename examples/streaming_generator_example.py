@@ -6,8 +6,7 @@ from salesgpt.agents import SalesGPT
 # Load environment variables
 load_dotenv()
 
-# Initialize the language model with desired settings
-llm = ChatLiteLLM(temperature=0.9, model_name="gpt-3.5-turbo-0613")
+llm = ChatLiteLLM(temperature=0.9, model_name="gpt-4o-mini-0613")
 
 # Create the SalesGPT agent with Flipkart-specific information
 sales_agent = SalesGPT.from_llm(
