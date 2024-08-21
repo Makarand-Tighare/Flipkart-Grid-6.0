@@ -64,7 +64,7 @@ if __name__ == "__main__":
         if USE_TOOLS:
             sales_agent_kwargs.update(
                 {
-                    "product_catalog": "examples/sample_product_catalog.txt",
+                    "product_catalog": "examples/sample_product_catalog.json",
                     "salesperson_name": "Ted Lasso",
                 }
             )
