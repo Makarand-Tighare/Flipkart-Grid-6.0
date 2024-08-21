@@ -61,6 +61,7 @@ Original Price: ₹79600
 Discount: 25 
 Rating: None
 
+<<<<<<< HEAD
 Product Name 9: Motorola g04s (Satin Blue, 64 GB)
 Product Url: https://www.flipkart.com/motorola-g04s-satin-blue-64-gb/p/itma899ac4728c8e?pid=MOBHY9PQM9H8HMEN&lid=LSTMOBHY9PQM9H8HMENQJT1JU&marketplace=FLIPKART&q=smartphone&store=tyy%2F4io&srno=s_1_10&otracker=search&fm=organic&iid=c81bc9e8-6486-4258-b139-2627b9dbf550.MOBHY9PQM9H8HMEN.SEARCH&ppt=None&ppn=None&ssid=thbuypqwk00000001724267792306&qH=1036ba3c4ed2c021
 Price: $6999
@@ -68,3 +69,11 @@ Original Price: ₹9999
 Discount: 30 
 Rating: None
 
+=======
+Product Name 9: Men Printed Round Neck Pure Cotton White T-Shirt
+Product Url: https://www.flipkart.com/here-now-printed-men-round-neck-white-t-shirt/p/itma60929666cf67?pid=TSHFZYR74AWVGSWJ&lid=LSTTSHFZYR74AWVGSWJ2L5GIA&marketplace=FLIPKART&store=clo%2Fash%2Fank%2Fedy&srno=b_1_37&otracker=browse&fm=organic&iid=en_DqVmAVZp9JcOZ12w0LyUwrKNi5sUGGs1z5z_MLmpdhvH-cXFxI5pq2u6DFS7aL2vWKYgXMkAMhlB8Lqwte7vpA%3D%3D&ppt=None&ppn=None&ssid=hf14v6qij40000001724248641965
+Price: $196
+Original Price: ₹699
+Discount: 71 
+Rating: None
+>>>>>>> 7a7050dfcd29834e3be8eed91bf710b76b2d52ff

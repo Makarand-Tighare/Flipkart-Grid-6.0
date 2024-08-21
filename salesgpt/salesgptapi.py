@@ -15,7 +15,7 @@ class SalesGPTAPI:
         config_path: str,
         verbose: bool = True,
         max_num_turns: int = 20,
-        model_name: str = "gpt-3.5-turbo",
+        model_name: str = "gpt-4o-mini",
         product_catalog: str = "examples/sample_product_catalog.txt",
         use_tools=True,
     ):
@@ -100,6 +100,8 @@ class SalesGPTAPI:
             if self.sales_agent.conversation_history
             else ""
         )
+        cleaned_reply = reply.replace('`', '')
+        response = ": ".join(cleaned_reply.split(": ")[1:]).rstrip("<END_OF_TURN>")
         #print("AI LOG INTERMEDIATE STEPS: ", ai_log["intermediate_steps"])
 
         if (
@@ -139,7 +141,7 @@ class SalesGPTAPI:
         print(reply)
         payload = {
             "bot_name": reply.split(": ")[0],
-            "response": ": ".join(reply.split(": ")[1:]).rstrip("<END_OF_TURN>"),
+            "response": response,
             "conversational_stage": self.sales_agent.current_conversation_stage,
             "tool": tool,
             "tool_input": tool_input,

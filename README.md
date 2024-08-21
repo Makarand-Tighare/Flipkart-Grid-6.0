@@ -124,7 +124,7 @@ load_dotenv() # make sure you have .env file with your API keys, eg., OPENAI_API
 llm = ChatLiteLLM(temperature=0.4, model_name="gpt-4-0125-preview") 
                             
 sales_agent = SalesGPT.from_llm(llm, use_tools=True, verbose=False,
-                            product_catalog = "examples/sample_product_catalog.txt",
+                            product_catalog = "examples/sample_product_catalog.json",
                             salesperson_name="Ted Lasso",
                             salesperson_role="Sales Representative",
                             company_name="Sleep Haven",

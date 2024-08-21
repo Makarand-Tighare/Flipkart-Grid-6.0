@@ -42,7 +42,7 @@ class TestSalesGPT:
         if use_mock_api:
             self.api_key = None  # Force the use of mock API by unsetting the API key
 
-        llm = ChatLiteLLM(temperature=0.9, model="gpt-4-0125-preview")
+        llm = ChatLiteLLM(temperature=0.9, model="gpt-4o-mini")
 
         sales_agent = SalesGPT.from_llm(
             llm,
@@ -101,6 +101,7 @@ class TestSalesGPT:
         sales_agent = SalesGPT.from_llm(
             llm,
             verbose=False,
+
             use_tools=True,  # Corrected to a boolean value instead of a string
             product_catalog=f"{data_dir}/sample_product_catalog.txt",  # Assuming `data_dir` is defined elsewhere
             salesperson_name="Ted Lasso",
@@ -135,6 +136,7 @@ class TestSalesGPT:
         sales_agent = SalesGPT.from_llm(
             llm,
             verbose=False,
+
             use_tools=True,  # Corrected to a boolean value instead of a string
             product_catalog=f"{data_dir}/sample_product_catalog.txt",  # Assuming `data_dir` is defined elsewhere
             salesperson_name="Ted Lasso",
@@ -202,7 +204,7 @@ class TestSalesGPT:
     @pytest.mark.asyncio
     async def test_valid_async_inference_stream(self, load_env):
         llm = ChatLiteLLM(temperature=0.9)
-        model_name = "gpt-3.5-turbo"
+        model_name = "gpt-4o-mini"
 
         sales_agent = SalesGPT.from_llm(
             llm,
@@ -243,6 +245,7 @@ class TestSalesGPT:
         sales_agent_passing_str = SalesGPT.from_llm(
             llm,
             verbose=False,
+
             use_tools=True,  # Corrected to pass a boolean value
             product_catalog="tests/test_data/sample_product_catalog.txt",
             salesperson_name="Ted Lasso",
@@ -283,7 +286,7 @@ class TestSalesGPT:
             llm,
             verbose=False,
             use_tools=True,
-            product_catalog="tests/test_data/sample_product_catalog.txt",
+            product_catalog="tests/test_data/sample_product_catalog.json",
             salesperson_name="Ted Lasso",
             salesperson_role="Sales Representative",
             company_name="Sleep Haven",
