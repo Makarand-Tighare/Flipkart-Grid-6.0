@@ -208,3 +208,4 @@ internal/*
 wandb
 depot/*
 litellm_uuid.txt
+/myenv
