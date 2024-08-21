@@ -117,7 +117,6 @@ pytest-asyncio==0.23.8
 pytest-cov==4.1.0
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
-pywin32==306
 PyYAML==6.0.2
 pyzmq==26.1.0
 regex==2024.7.24

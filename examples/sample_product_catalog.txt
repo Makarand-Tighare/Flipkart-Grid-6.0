@@ -67,4 +67,3 @@ Price: $32990
 Original Price: ₹62500
 Discount: 47 
 Rating: None
-

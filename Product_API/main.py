@@ -4,6 +4,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from Crawler import Get_Order_History,Get_Product_Details,Get_Related_Post
 from pathlib import Path
+from paragraphGenerator import summarize_product_info
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -46,6 +47,9 @@ def get_product_details():
             ])
 
             formatted_response = f'Product Name: {product_details.get("name")}\nDescription: {product_details.get("product_description")}\nCurrent Price: ₹{product_details.get("current_price")}\nOriginal Price: ₹{product_details.get("original_price")}\nDiscount: {product_details.get("discount_percent")}%\nRating: {product_details.get("rating")}\nNumber of Ratings: {product_details.get("no_of_rating")}\nNumber of Reviews: {product_details.get("no_of_reviews")}\nHighlights:\n{highlights_str}\nOffers:\n{offers_str}\nSpecifications:\n{specs_str}\n'
+
+            # Summarize the product info
+            formatted_response = summarize_product_info(formatted_response)
 
             with open('product_details.txt', 'w', encoding='utf-8') as file:
                 file.write(formatted_response)
