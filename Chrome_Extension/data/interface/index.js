@@ -1,3 +1,13 @@
+function generateRandomString(length) {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      result += characters.charAt(randomIndex);
+  }
+  return result;
+}
+
 var background = {
   "port": null,
   "message": {},
@@ -206,13 +216,15 @@ var config = {
    "callApi": function (transcript) {
     console.log(transcript);
 
+    let session_id = generateRandomString(5);
+
     fetch('http://127.0.0.1:8000/chat', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        session_id: '123',
+        session_id: session_id,
         human_say: transcript
       })
     })

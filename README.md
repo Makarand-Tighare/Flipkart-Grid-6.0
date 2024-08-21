@@ -2,6 +2,10 @@
 
 # :robot: SalesGPT - Open Source AI Agent for Sales
 
+```
+uvicorn run_api:app --port 8000
+```
+
 <img src="https://demo-bucket-45.s3.amazonaws.com/filtr145_simple_robot_mascot_for_a_sales_company_professional_5282c6e6-40c1-4576-95c8-e4ba3c389f3f.png"  width="200">
 
 ![GitHub Repo stars](https://img.shields.io/github/stars/filip-michalsky/SalesGPT?style=social)

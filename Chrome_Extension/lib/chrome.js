@@ -275,6 +275,7 @@ function sendUrlToRelatedPostApi(fullUrl) {
   .then(response => response.json())
   .then(data => {
     console.log('Parsed JSON data for related posts:', data);
+
     data.forEach(post => {
       console.log('Product Name:', post.Product_Name);
       console.log('Product URL:', post.Product_URL);

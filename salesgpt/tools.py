@@ -25,6 +25,9 @@ def setup_knowledge_base(
         product_catalog = f.read()
 
     text_splitter = CharacterTextSplitter(chunk_size=5000, chunk_overlap=200)
+    print(text_splitter)
+    print(product_catalog)
+    print("\n\n\n\n\n")
     texts = text_splitter.split_text(product_catalog)
 
     llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
@@ -251,6 +254,7 @@ def get_tools(product_catalog):
 
     # we only use four tools for now, but this is highly extensible!
     knowledge_base = setup_knowledge_base(product_catalog)
+    
     tools = [
         Tool(
             name="ProductSearch",
