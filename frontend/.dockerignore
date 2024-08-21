@@ -1,9 +1,0 @@
-node_modules
-
-env/
-__pychace__/
-
-*.env
-*.env.*
-env.*
-

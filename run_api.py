@@ -16,7 +16,9 @@ load_dotenv()
 
 # Access environment variables
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+
 CORS_ORIGINS = ["*"]
+
 CORS_METHODS = ["GET", "POST"]
 
 # Initialize FastAPI app

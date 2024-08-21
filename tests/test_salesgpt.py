@@ -50,16 +50,13 @@ class TestSalesGPT:
             use_tools=False,
             salesperson_name="Ted Lasso",
             salesperson_role="Sales Representative",
-            company_name="Sleep Haven",
-            company_business="""Sleep Haven 
-                                    is a premium mattress company that provides
-                                    customers with the most comfortable and
-                                    supportive sleeping experience possible. 
-                                    We offer a range of high-quality mattresses,
-                                    pillows, and bedding accessories 
-                                    that are designed to meet the unique 
-                                    needs of our customers.""",
+            company_name="Flipkart",
+            company_business="""Flipkart is India's leading e-commerce platform, offering a wide range of products 
+                                including electronics, fashion, home essentials, and groceries. We strive to provide 
+                                our customers with an exceptional shopping experience through our seamless platform, 
+                                competitive pricing, and reliable delivery services.""",
         )
+
 
         sales_agent.seed_agent()
         sales_agent.determine_conversation_stage()
@@ -104,20 +101,18 @@ class TestSalesGPT:
         sales_agent = SalesGPT.from_llm(
             llm,
             verbose=False,
-            use_tools="True",
-            product_catalog=f"{data_dir}/sample_product_catalog.json",
+
+            use_tools=True,  # Corrected to a boolean value instead of a string
+            product_catalog=f"{data_dir}/sample_product_catalog.txt",  # Assuming `data_dir` is defined elsewhere
             salesperson_name="Ted Lasso",
             salesperson_role="Sales Representative",
-            company_name="Sleep Haven",
-            company_business="""Sleep Haven 
-                                    is a premium mattress company that provides
-                                    customers with the most comfortable and
-                                    supportive sleeping experience possible. 
-                                    We offer a range of high-quality mattresses,
-                                    pillows, and bedding accessories 
-                                    that are designed to meet the unique 
-                                    needs of our customers.""",
+            company_name="Flipkart",
+            company_business="""Flipkart is India's leading e-commerce platform, offering a wide range of products 
+                                including electronics, fashion, home essentials, and groceries. We strive to provide 
+                                our customers with an exceptional shopping experience through our seamless platform, 
+                                competitive pricing, and reliable delivery services.""",
         )
+
 
         sales_agent.seed_agent()
         sales_agent.determine_conversation_stage()  # optional for demonstration, built into the prompt
@@ -141,20 +136,18 @@ class TestSalesGPT:
         sales_agent = SalesGPT.from_llm(
             llm,
             verbose=False,
-            use_tools="True",
-            product_catalog=f"{data_dir}/sample_product_catalog.json",
+
+            use_tools=True,  # Corrected to a boolean value instead of a string
+            product_catalog=f"{data_dir}/sample_product_catalog.txt",  # Assuming `data_dir` is defined elsewhere
             salesperson_name="Ted Lasso",
             salesperson_role="Sales Representative",
-            company_name="Sleep Haven",
-            company_business="""Sleep Haven 
-                                    is a premium mattress company that provides
-                                    customers with the most comfortable and
-                                    supportive sleeping experience possible. 
-                                    We offer a range of high-quality mattresses,
-                                    pillows, and bedding accessories 
-                                    that are designed to meet the unique 
-                                    needs of our customers.""",
+            company_name="Flipkart",
+            company_business="""Flipkart is India's leading e-commerce platform, offering a wide range of products 
+                                including electronics, fashion, home essentials, and groceries. We strive to provide 
+                                our customers with an exceptional shopping experience through our seamless platform, 
+                                competitive pricing, and reliable delivery services.""",
         )
+
 
         sales_agent.seed_agent()
         sales_agent.determine_conversation_stage()  # optional for demonstration, built into the prompt
@@ -178,16 +171,13 @@ class TestSalesGPT:
             verbose=False,
             salesperson_name="Ted Lasso",
             salesperson_role="Sales Representative",
-            company_name="Sleep Haven",
-            company_business="""Sleep Haven 
-                                    is a premium mattress company that provides
-                                    customers with the most comfortable and
-                                    supportive sleeping experience possible. 
-                                    We offer a range of high-quality mattresses,
-                                    pillows, and bedding accessories 
-                                    that are designed to meet the unique 
-                                    needs of our customers.""",
+            company_name="Flipkart",
+            company_business="""Flipkart is one of India's leading e-commerce platforms, offering a wide range of products 
+                                including electronics, fashion, home essentials, and groceries. We strive to provide 
+                                our customers with an exceptional shopping experience through our seamless platform, 
+                                competitive pricing, and reliable delivery services.""",
         )
+
 
         sales_agent.seed_agent()
         sales_agent.determine_conversation_stage()  # optional for demonstration, built into the prompt
@@ -220,17 +210,14 @@ class TestSalesGPT:
             llm,
             verbose=False,
             salesperson_name="Ted Lasso",
-            salesperson_role="Sales Representative",
-            company_name="Sleep Haven",
-            company_business="""Sleep Haven 
-                                    is a premium mattress company that provides
-                                    customers with the most comfortable and
-                                    supportive sleeping experience possible. 
-                                    We offer a range of high-quality mattresses,
-                                    pillows, and bedding accessories 
-                                    that are designed to meet the unique 
-                                    needs of our customers.""",
+            salesperson_role="Business Development Representative",
+            company_name="Flipkart",
+            company_business="""Flipkart is one of India's leading e-commerce platforms, offering a wide range of products 
+                                including electronics, fashion, home essentials, and groceries. We strive to provide 
+                                our customers with an exceptional shopping experience through our seamless platform, 
+                                competitive pricing, and reliable delivery services.""",
         )
+
 
         sales_agent.seed_agent()
         sales_agent.determine_conversation_stage()  # optional for demonstration, built into the prompt
@@ -258,20 +245,18 @@ class TestSalesGPT:
         sales_agent_passing_str = SalesGPT.from_llm(
             llm,
             verbose=False,
-            use_tools="True",
-            product_catalog="tests/test_data/sample_product_catalog.json",
+
+            use_tools=True,  # Corrected to pass a boolean value
+            product_catalog="tests/test_data/sample_product_catalog.txt",
             salesperson_name="Ted Lasso",
-            salesperson_role="Sales Representative",
-            company_name="Sleep Haven",
-            company_business="""Sleep Haven
-                                    is a premium mattress company that provides
-                                    customers with the most comfortable and
-                                    supportive sleeping experience possible.
-                                    We offer a range of high-quality mattresses,
-                                    pillows, and bedding accessories
-                                    that are designed to meet the unique
-                                    needs of our customers.""",
-        )  # Passing use_tools="True" as arg
+            salesperson_role="Business Development Representative",
+            company_name="Flipkart",
+            company_business="""Flipkart is one of India's leading e-commerce platforms, offering a wide range of products 
+                                including electronics, fashion, home essentials, and groceries. We strive to provide 
+                                our customers with an exceptional shopping experience through our seamless platform, 
+                                competitive pricing, and reliable delivery services.""",
+        )
+
         assert isinstance(sales_agent_passing_str, SalesGPT)
         assert sales_agent_passing_str.seed_agent() is None
         output = sales_agent_passing_str.step()
