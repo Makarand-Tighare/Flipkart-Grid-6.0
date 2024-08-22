@@ -8,6 +8,18 @@ function generateRandomString(length) {
   return result;
 }
 
+function addMessageToChatBox(sender, message) {
+  const chatBox = document.getElementById("chat-box");
+  const messageElement = document.createElement("div");
+  messageElement.classList.add(sender);
+  messageElement.textContent = message;
+  chatBox.appendChild(messageElement);
+  chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom
+}
+
+var isCancelled = false;
+
+
 var background = {
   "port": null,
   "message": {},
@@ -86,6 +98,7 @@ var config = {
     "start": {},
     "dialect": {},
     "interim": {},
+    "cancel": {},
     "language": {}
   },
   "linebreak": function (e) {
@@ -163,6 +176,7 @@ var config = {
       return;
     }
 
+    isCancelled = false;
     config.speech.synthesis.start.timestamp = e.timeStamp;
     config.recognition.lang = config.button.dialect.value;
     config.speech.synthesis.final.transcript = '';
@@ -171,8 +185,30 @@ var config = {
     config.button.interim.textContent = '';
     config.button.final.textContent = '';
 
+    config.button.cancel.disabled = false;
+
     config.recognition.start();
   },
+
+  "cancel": function () {
+  if (config.speech.synthesis.recognizing) {
+    isCancelled = true; // Set the cancellation flag
+    config.recognition.stop(); // Stop recognition when cancel is clicked
+    config.show.info("canceled", "Speech recognition canceled.");
+
+    // Clear any interim or final results
+    config.button.interim.textContent = '';
+    config.button.final.textContent = '';
+
+    // Disable the cancel button after canceling
+    config.button.cancel.disabled = true;
+
+    // Reset the microphone button icon to the default state
+    config.button.talk.src = "images/mic.png";
+  }
+},
+
+  
 
   "callGoogleTTS": async function (text) {
     const apiKey = '';
@@ -218,6 +254,13 @@ var config = {
 
     let session_id = generateRandomString(5);
 
+    // Display the user's message in the chat box
+    addMessageToChatBox("user", transcript);
+
+    // Storing user input
+    const userKey = `user_${session_id}`;
+    sessionStorage.setItem(userKey, transcript);
+    
     fetch('http://127.0.0.1:8000/chat', {
       method: 'POST',
       headers: {
@@ -234,6 +277,13 @@ var config = {
 
       // Extract the bot's response text
       const botResponse = data.response;
+
+      // Display the bot's message in the chat box
+      addMessageToChatBox("bot", botResponse);
+
+      // Storing bot response
+      const botKey = `bot_${session_id}`;
+      sessionStorage.setItem(botKey, botResponse);
 
       // Call Google TTS
       config.callGoogleTTS(botResponse);
@@ -254,7 +304,8 @@ var config = {
     .catch(error => {
       console.error('Error:', error);
     });
-  },
+},
+
 
 
 
@@ -372,12 +423,14 @@ var config = {
     config.button.interim = document.getElementById("interim");
     config.button.dialect = document.getElementById("dialect");
     config.button.language = document.getElementById("language");
+    config.button.cancel = document.getElementById("cancel");
     config.current.element.final = document.querySelector(".container .results .final");
     config.current.element.interim = document.querySelector(".container .results .interim");
     /*  */
     config.button.start.addEventListener("click", config.start, false);
     config.button.dialect.addEventListener("change", config.store.dialect, false);
     config.button.language.addEventListener("change", config.store.language, false);
+    config.button.cancel.addEventListener("click", config.cancel, false);
     /*  */
     reload.addEventListener("click", function () {
       document.location.reload();
@@ -431,6 +484,9 @@ var config = {
           config.flash.start();
           config.speech.synthesis.recognizing = true;
           config.button.talk.src = "images/micactive.png";
+
+          
+          config.button.cancel.classList.add('enabled');
           /*  */
           const dialect = config.button.dialect[config.button.dialect.selectedIndex].textContent;
           const language = config.button.language[config.button.language.selectedIndex].textContent;
@@ -439,10 +495,19 @@ var config = {
         },
         "onend": function () {
           config.speech.synthesis.recognizing = false;
+
+          if (isCancelled) {
+            return;
+          }
+          
+
           if (config.speech.synthesis.ignore.onend) return;
           /*  */
           config.flash.stop();
           config.button.talk.src = "images/mic.png";
+
+          
+          config.button.cancel.classList.remove('enabled');
           if (!config.speech.synthesis.final.transcript) {
             config.show.info("end", "No results to show! please try again later.");
             return;
@@ -454,7 +519,12 @@ var config = {
           config.show.info("copy");
         },
         "onresult": function (e) {
+          if (isCancelled) {
+            return; // Do nothing if cancelled
+          }
+
           const error = e.results === undefined || (typeof e.results) === "undefined";
+
           if (error) {
             config.recognition.onend = null;
             config.recognition.stop();

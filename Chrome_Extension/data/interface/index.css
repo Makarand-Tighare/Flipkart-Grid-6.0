@@ -7,6 +7,34 @@ html, body {
   font-family: monospace;
 }
 
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(240, 10%, 3.9%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(240, 10%, 3.9%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(240, 10%, 3.9%);
+  --primary: hsl(240, 5.9%, 10%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(240, 4.8%, 95.9%);
+  --secondary-foreground: hsl(240, 5.9%, 10%);
+  --muted: hsl(240, 4.8%, 95.9%);
+  --muted-foreground: hsl(240, 3.8%, 45%);
+  --accent: hsl(240, 4.8%, 95.9%);
+  --accent-foreground: hsl(240, 5.9%, 10%);
+  --destructive: hsl(0, 72%, 51%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 5.9%, 90%);
+  --input: hsl(240, 5.9%, 90%);
+  --ring: hsl(240, 5.9%, 10%);
+  --chart-1: hsl(173, 58%, 39%);
+  --chart-2: hsl(12, 76%, 61%);
+  --chart-3: hsl(197, 37%, 24%);
+  --chart-4: hsl(43, 74%, 66%);
+  --chart-5: hsl(27, 87%, 67%);
+  --radius: 1rem;
+}
+
 table {
   border: 0;
   margin: 0;
@@ -17,29 +45,55 @@ table {
 }
 
 .container {
-  height: 100%;
+  height: 90.9%; 
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
-  border-bottom: 1px solid rgba(0,0,0,0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+
+
+
+#user-input {
+  width: calc(100% - 80px);
+  padding: 8px;
+  margin-right: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+#send-button {
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #2196F3;
+  color: white;
+  cursor: pointer;
+  width: 70px;
+  box-sizing: border-box;
 }
 
 .container .results {
   border: 0;
-  margin: 0;
   padding: 10px;
-  height: 400px;
-  overflow: hidden;
+  height: auto;
+  max-height: 35%; /* Adjust the height based on the available space */
+  overflow-y: auto;
   box-sizing: border-box;
   background-color: #fff;
   width: calc(100% - 42px);
+  margin-top: auto; /* Push the .results section to the bottom */
 }
+
 
 .container .results .final,
 .container .results .final:focus {
   border: 0;
   padding: 0;
   width: 100%;
-  height: 100%;
   outline: none;
   overflow-y: auto;
 }
@@ -49,44 +103,59 @@ table {
   font-size: 14px;
 }
 
-.container .results .final pre,
-.container .results .interim pre {
-  border: 0 !important;
-  padding: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  font-size: inherit !important;
-  padding-right: 10px !important;
-  font-family: inherit !important;
+
+.message {
+  padding: 5px;
+  margin: 5px 0;
+  border-radius: 5px;
+  font-size: 14px;
+  line-height: 1.4;
 }
 
-.container .results:has(.interim:empty) .final {
-  display: inline-block;
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
 }
 
-.container .console {
-  margin: 0;
-  width: 100%;
-  height: 100%;
+
+#chat-box {
+  flex: 1; /* Make the chat box fill the available space */
+  overflow-y: auto;
   padding: 10px;
-  overflow: hidden;
+  border: 1px solid #ffffff;
   box-sizing: border-box;
-  border-top: solid 1px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
 }
 
-.container .console pre {
-  padding: 0;
-  width: 100%;
-  color: #333;
-  height: 100%;
-  margin: auto;
-  font-size: 13px;
-  line-height: 22px;
-  white-space: pre-wrap;
-  font-family: monospace;
+
+.user, .bot {
+  display: inline-block; /* Adjust box size to content */
+  max-width: 80%; /* Limit width for readability */
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 10px;
+  font-size: 1.2rem; /* Adjust font size */
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
+
+.user {
+  background-color: var(--secondary); 
+  color: var(--foreground);
+  align-self: flex-end; /* Align to the right */
+  text-align: right;
+}
+
+.bot {
+  background-color: var(--card); 
+  color: var(--foreground);
+  align-self: flex-start; /* Align to the left */
+  text-align: left;
+}
+
+
 
 .buttons {
   left: 0;
@@ -102,6 +171,49 @@ table {
 
 .buttons table tr td {
   padding: 10px;
+}
+
+#cancel {
+  background-color: #f44336;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: not-allowed;
+  transition: background-color 0.3s;
+}
+
+#cancel.enabled {
+  cursor: pointer;
+  background-color: #d32f2f;
+}
+
+#cancel:hover.enabled {
+  background-color: #c62828;
+}
+
+#user-input {
+  width: calc(100% - 70px);
+  padding: 5px;
+  margin: 5px;
+  box-sizing: border-box;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+#send-button {
+  width: 60px;
+  padding: 5px;
+  margin: 5px;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+#send-button:hover {
+  background-color: #0056b3;
 }
 
 .buttons input {
@@ -186,13 +298,21 @@ table {
   text-align: right;
 }
 
+.console {
+  position: relative; /* Make sure this is relative to position toolbar absolutely */
+  border: 1px solid #ccc; /* Add border to distinguish the console */
+  padding: 10px;
+  height: 6%;
+  border-radius: 10px;
+  margin: 5px;
+}
+
 .toolbar {
-  top: 0;
-  right: 0;
+  position: absolute;
+  top: 5px; 
+  right: 10px; 
   border: 0;
   padding: 0;
-  z-index: 11;
-  position: fixed;
   background-color: #fff;
 }
 
@@ -210,7 +330,7 @@ table {
   cursor: pointer;
   user-select: none;
   text-align: center;
-  transition: 300ms ease all;
+  transition: background-color 300ms ease;
   background-color: transparent;
 }
 
@@ -230,10 +350,13 @@ table {
   }
 }
 
-@media (max-width: 550px) {
-  .toolbar {
-    display: none !important;
+@media (max-width: 650px) {
+  .container{
+    height: 88%;
   }
+}
+
+@media (max-width: 550px) {
   .container .results {
     height: 350px;
   }
