@@ -3,6 +3,36 @@ import re
 import requests
 from bs4 import BeautifulSoup as bs
 
+def generate_paragraph(info):
+    paragraph = []
+
+    if info.get("product_description"):
+        paragraph.append(f"{info['discount_percent']} ")
+
+    if info.get("original_price") and info.get("discount_percent"):
+        paragraph.append(f"**Product has a discount of {info['discount_percent']} from the original price of {info['original_price']}.**")
+
+    if info.get("rating") and info.get("no_of_rating") and info.get("no_of_reviews"):
+        paragraph.append(f"**The product has a rating of {info['rating']} based on {info['no_of_rating']} ratings and {info['no_of_reviews']} reviews.**")
+
+    if info.get("highlights"):
+        paragraph.append(f"**Some of the key highlights include: {', '.join(info['highlights'])}.**")
+
+    if info.get("offers"):
+        offers = [f"{offer['Offer_type']}: {offer['Offer_Description']}" for offer in info["offers"]]
+        paragraph.append(f"**Current offers available are: {', '.join(offers)}.**")
+
+    if info.get("specs"):
+        specs = []
+        for spec in info["specs"]:
+            section_title = spec["title"]
+            section_details = ', '.join([f"{item['property']}: {item['value']}" for item in spec["details"]])
+            specs.append(f"{section_title} - {section_details}")
+        paragraph.append(f"**Specifications include: {'. '.join(specs)}.**")
+
+    return ' '.join(paragraph)
+
+
 def Get_Related_Post(url: str):
     '''
     Example Url
@@ -15,9 +45,12 @@ def Get_Related_Post(url: str):
     response = requests.get(url)
 
     soup = bs(response.text, 'html.parser')
-    elements = soup.find_all("div", class_="_75nlfW")[:10]
-    results = []
 
+    elements = soup.find_all("div", class_="_75nlfW")[:10]
+    if len(elements) == 0:
+        elements = soup.find_all("div", class_="slAVV4")[:10]
+
+    results = []
     try:
         for element in elements:
             try:
