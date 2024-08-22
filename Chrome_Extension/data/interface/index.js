@@ -230,7 +230,7 @@ var config = {
     })
     .then(response => response.json())
     .then(data => {
-      console.log('Bot Response:', data);
+      console.log('Bot Response:', data.response);
 
       // Extract the bot's response text
       const botResponse = data.response;

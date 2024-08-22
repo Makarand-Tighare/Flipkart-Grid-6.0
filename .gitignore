@@ -133,6 +133,10 @@ env.bak/
 venv.bak/
 website/docs/.env
 
+
+Product_API/product_details.txt
+examples\sample_product_catalog.txt
+
 # Spyder project settings
 .spyderproject
 .spyproject
