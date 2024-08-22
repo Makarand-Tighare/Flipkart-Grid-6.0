@@ -104,11 +104,6 @@ var config = {
   "linebreak": function (e) {
     return e.replace(/\n\n/g, "<p></p>").replace(/\n/g, "<br>");
   },
-  "addon": {
-    "homepage": function () {
-      return chrome.runtime.getManifest().homepage_url;
-    }
-  },
   "app": {
     "start": function () {
       config.speech.synthesis.init();

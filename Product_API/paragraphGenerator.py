@@ -1,96 +1,124 @@
-def parse_product_info(input_string):
+def summarize_product_info(input_string):
     lines = input_string.splitlines()
-    product_info = {
-        "Product Name": "",
-        "Description": "",
-        "Current Price": "",
-        "Original Price": "",
-        "Discount": "",
-        "Rating": "",
-        "Number of Ratings": "",
-        "Number of Reviews": "",
-        "Highlights": [],
-        "Offers": [],
-        "Specifications": {}
-    }
-
-    # Parsing the string line by line
-    current_section = None
-    for line in lines:
-        line = line.strip()
-        if line.startswith("Product Name:"):
-            product_info["Product Name"] = line.replace("Product Name:", "").strip()
-        elif line.startswith("Description:"):
-            product_info["Description"] = line.replace("Description:", "").strip()
-        elif line.startswith("Current Price:"):
-            product_info["Current Price"] = line.replace("Current Price:", "").strip()
-        elif line.startswith("Original Price:"):
-            product_info["Original Price"] = line.replace("Original Price:", "").strip()
-        elif line.startswith("Discount:"):
-            product_info["Discount"] = line.replace("Discount:", "").strip()
-        elif line.startswith("Rating:"):
-            product_info["Rating"] = line.replace("Rating:", "").strip()
-        elif line.startswith("Number of Ratings:"):
-            product_info["Number of Ratings"] = line.replace("Number of Ratings:", "").strip()
-        elif line.startswith("Number of Reviews:"):
-            product_info["Number of Reviews"] = line.replace("Number of Reviews:", "").strip()
-        elif line.startswith("Highlights:"):
-            current_section = "Highlights"
-        elif line.startswith("Offers:"):
-            current_section = "Offers"
-        elif line.startswith("Specifications:"):
-            current_section = "Specifications"
-        elif current_section == "Highlights" and line.startswith("-"):
-            product_info["Highlights"].append(line.replace("-", "").strip())
-        elif current_section == "Offers" and line.startswith("-"):
-            product_info["Offers"].append(line.replace("-", "").strip())
-        elif current_section == "Specifications" and line.endswith(":"):
-            section = line.replace(":", "").strip()
-            product_info["Specifications"][section] = {}
-            current_section = section
-        elif current_section in product_info["Specifications"]:
-            if ":" in line:
-                key, value = line.split(":", 1)
-                product_info["Specifications"][current_section][key.strip()] = value.strip()
-
-    return product_info
-
-
-def generate_paragraph(info):
     paragraph = []
 
-    if info.get("Product Name"):
-        paragraph.append(f"**The product name is** {info['Product Name']}.")
+    current_section = None
 
-    if info.get("Description"):
-        paragraph.append(f"**Its description is:** {info['Description']}.")
+    for line in lines:
+        line = line.strip()
 
-    if info.get("Current Price") and info.get("Original Price") and info.get("Discount"):
-        paragraph.append(f"**It is currently priced at {info['Current Price']} after a discount of {info['Discount']} from the original price of {info['Original Price']}.**")
+        if line.startswith("Product Name:"):
+            product_name = line.replace("Product Name:", "").strip()
+            paragraph.append(f"**The product name is** {product_name}.")
 
-    if info.get("Rating") and info.get("Number of Ratings"):
-        paragraph.append(f"**The product has a rating of {info['Rating']} based on {info['Number of Ratings']} ratings and {info.get('Number of Reviews', 'several')} reviews.**")
+        elif line.startswith("Description:"):
+            description = line.replace("Description:", "").strip()
+            if description:
+                paragraph.append(f"**Its description is:** {description}.")
 
-    if info.get("Highlights"):
-        paragraph.append(f"**Some of the key highlights include: {', '.join(info['Highlights'])}.**")
+        elif line.startswith("Current Price:"):
+            current_price = line.replace("Current Price:", "").strip()
 
-    if info.get("Offers"):
-        paragraph.append(f"**Current offers available are: {', '.join(info['Offers'])}.**")
+        elif line.startswith("Original Price:"):
+            original_price = line.replace("Original Price:", "").strip()
 
-    if info.get("**Specifications**"):
-        specs = []
-        for section, details in info["Specifications"].items():
-            section_details = ', '.join([f"{key}: {value}" for key, value in details.items()])
-            specs.append(f"{section} - {section_details}")
-        paragraph.append(f"Specifications include: {', '.join(specs)}.")
+        elif line.startswith("Discount:"):
+            discount = line.replace("Discount:", "").strip()
+            if current_price and original_price:
+                paragraph.append(f"**It is currently priced at {current_price} after a discount of {discount} from the original price of {original_price}.**")
+
+        elif line.startswith("Rating:"):
+            rating = line.replace("Rating:", "").strip()
+
+        elif line.startswith("Number of Ratings:"):
+            num_ratings = line.replace("Number of Ratings:", "").strip()
+
+        elif line.startswith("Number of Reviews:"):
+            num_reviews = line.replace("Number of Reviews:", "").strip()
+            if rating and num_ratings:
+                paragraph.append(f"**The product has a rating of {rating} based on {num_ratings} ratings and {num_reviews or 'several'} reviews.**")
+
+        elif line.startswith("Highlights:"):
+            current_section = "Highlights"
+            highlights = []
+
+        elif line.startswith("Offers:"):
+            if highlights:
+                paragraph.append(f"**Some of the key highlights include: {', '.join(highlights)}.**")
+            current_section = "Offers"
+            offers = []
+
+        elif line.startswith("Specifications:"):
+            if offers:
+                paragraph.append(f"**Current offers available are: {', '.join(offers)}.**")
+            current_section = "Specifications"
+
+        elif current_section == "Highlights" and line.startswith("-"):
+            highlights.append(line.replace("-", "").strip())
+
+        elif current_section == "Offers" and line.startswith("-"):
+            offers.append(line.replace("-", "").strip())
+
+        elif current_section == "Specifications" and line.endswith(":"):
+            section = line.replace(":", "").strip()
+            specs = []
+
+        elif current_section == "Specifications" and ":" in line:
+            key, value = line.split(":", 1)
+            specs.append(f"{key.strip()}: {value.strip()}")
+
+    # Handle remaining sections after loop
+    if highlights:
+        paragraph.append(f"**Some of the key highlights include: {', '.join(highlights)}.**")
+    if offers:
+        paragraph.append(f"**Current offers available are: {', '.join(offers)}.**")
+    if specs:
+        paragraph.append(f"**Specifications include: {', '.join(specs)}.**")
 
     return ' '.join(paragraph)
 
 
+input_string = """Product Name: pari pari 108 Uno Card And Magic Cube 3x3 Combo Set Pack Of 2  (2 Pieces)
+Description: 3x3 Speed Cube is an outstanding cube with great overall performance. It strikes a good balance between affordability and performance. Suitable for beginner and professional player The 3x3 cube has an endless amount of ways to solve it. Depending on whether you figure it out yourself or get help from tutorials.
+Current Price: ₹201
+Original Price: ₹349
+Discount: 42 %
+Rating: 3.6
+Number of Ratings: 12
+Number of Reviews: 1
+Highlights:
+  - Material: Plastic, Paper
+  - Age: 3+ Years
+  - Skillset: Alphabet & Number Recognition, Color & Shape Recognition, Time Management, Sensory Development, Memory Building, General Knowledge
+Offers:
+  - Special Price: Get extra 5% off (price inclusive of cashback/coupon)
+  - Partner Offer: Make a purchase and enjoy a surprise cashback/ coupon that you can redeem later!
+  - Bank Offer: Get ₹50 Instant Discount on first Flipkart UPI transaction on order of ₹200 and above
+  - Bank Offer: 5% Unlimited Cashback on Flipkart Axis Bank Credit Card
+Specifications:
+  - Puzzle Features:
+    - Type: Cubes
+    - Ideal for: Boys, Girls
+    - Minimum Age: 3 Years
+    - Character: UNO
+    - Material: Plastic, Paper
+  - Power Features:
+    - Battery Type: 0 No batteries Battery
+    - Rechargeable: No
+  - Additional Features:
+    - Battery Operated: No
+  - Product Dimensions:
+    - Product Width: 7 inch
+    - Product Height: 7 inch
+    - Product Depth: 3 inch
+    - Product Weight: 86 g
+  - Box Dimensions:
+    - Width: 7 inch
+    - Height: 7 inch
+    - Depth: 3 inch
+    - Weight: 86 g
+"""
 
-def summarize_product_info(input_string):
-
-    parsed_info = parse_product_info(input_string)
-    output_paragraph = generate_paragraph(parsed_info)
-    print(output_paragraph)
-    return output_paragraph
+# Summarize and print the product info
+output_paragraph = summarize_product_info(input_string)
+print(output_paragraph)

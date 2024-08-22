@@ -3,8 +3,7 @@
   "manifest_version": 3,
   "permissions": ["storage", "contextMenus","tabs","activeTab","cookies",
     "webNavigation"],
-  "name": "Speech to Text (Voice Recognition)",
-  "homepage_url": "https://mybrowseraddon.com/speech-to-text.html",
+  "name": "Flippi Text Assistant",
   "description": "An easy to use speech synthesis and recognition tool for your browser!",
   "commands": {
     "_execute_action": {}
