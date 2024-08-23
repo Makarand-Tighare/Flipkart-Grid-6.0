@@ -13,7 +13,7 @@ from litellm import completion
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from Product_API.Crawler import Get_Related_Post,Get_Product_Details,generate_paragraph
+from Product_API.Crawler import Get_Related_Post,Get_Product_Details,generate_paragraph, order_product
 
 from pathlib import Path
 
@@ -288,10 +288,14 @@ def get_related_products(query) :
         return f"We don't find any relevent products for {query} You can ask something else"
     
 def OrderProduct(query):
-    print("\n\n\n\n\n")
-    print(query)
-    print(type(query))
-    print("\n\n\n\n\n")
+    details = query.split(",")
+    print(details)
+    print("\n\n\n\n\n\n")
+    if(len(details) == 3) :
+        order_product(details[1], details[2], details[0])
+        return f"Your order has been placed succesfully"
+    else : 
+        return f"Please provide UPI id and postal code"
 
 
 def get_tools(product_catalog):
@@ -331,8 +335,11 @@ def get_tools(product_catalog):
         Tool(
             name="OrderProduct",
             func=OrderProduct,
-            description="Use this tool when a user wants to buy a product. If the UPI ID, and postal code are not provided, it prompts the user for these details. If all details are available, then it will get the product url of given product and it completes the purchase using the provided information also pass the product url strictly as query to the product."
+            description="Use this tool to place an order when a user wants to buy a product. The **input must always be the product URL followed by UPI id followed by postal code comma seperated**. If required details like the UPI ID or postal code are missing, ask the user for these details. Once the product URL, UPI ID, and postal code are provided, proceed to complete the purchase using this tool. Dont use the upi id or postal code on your own or pass them as blank"
         )
+
+
+
 
     ]
 
