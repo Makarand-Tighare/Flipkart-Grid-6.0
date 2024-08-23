@@ -331,7 +331,7 @@ def get_tools(product_catalog):
         Tool(
             name="OrderProduct",
             func=OrderProduct,
-            description="Use this tool when a user wants to buy a product. If the UPI ID, and postal code are not provided, it prompts the user for these details. If all details are available, then it will get the product url of given product and it completes the purchase using the provided information."
+            description="Use this tool when a user wants to buy a product. If the UPI ID, and postal code are not provided, it prompts the user for these details. If all details are available, then it will get the product url of given product and it completes the purchase using the provided information also pass the product url strictly as query to the product."
         )
 
     ]
