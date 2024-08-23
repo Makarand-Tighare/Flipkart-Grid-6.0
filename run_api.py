@@ -11,6 +11,8 @@ from pydantic import BaseModel
 
 from salesgpt.salesgptapi import SalesGPTAPI
 
+from datetime import datetime
+
 # Load environment variables
 load_dotenv()
 
@@ -65,9 +67,7 @@ async def get_bot_name(authorization: Optional[str] = Header(None)):
         
     sales_api = SalesGPTAPI(
         config_path=os.getenv("CONFIG_PATH", "examples/example_agent_setup.json"),
-        product_catalog=os.getenv(
-            "PRODUCT_CATALOG", "examples/sample_product_catalog.txt"
-        ),
+        product_catalog_path = "examples/sample_product_catalog.txt",
         verbose=True,
         model_name=os.getenv("GPT_MODEL", "gpt-4o-mini"),
     )
@@ -92,6 +92,8 @@ async def chat_with_sales_agent(req: MessageList, stream: bool = Query(False), a
     Note:
         Streaming functionality is planned but not yet available. The current implementation only supports synchronous responses.
     """
+    start = datetime.now()
+
     sales_api = None
     if os.getenv("ENVIRONMENT") == "production":
         get_auth_key(authorization)
@@ -106,9 +108,6 @@ async def chat_with_sales_agent(req: MessageList, stream: bool = Query(False), a
         sales_api = SalesGPTAPI(
             config_path=os.getenv("CONFIG_PATH", "examples/example_agent_setup.json"),
             verbose=True,
-            product_catalog=os.getenv(
-                "PRODUCT_CATALOG", "examples/sample_product_catalog.txt"
-            ),
             model_name=os.getenv("GPT_MODEL", "gpt-4o-mini"),
             use_tools=os.getenv("USE_TOOLS_IN_API", "True").lower()
             in ["true", "1", "t"],
@@ -116,7 +115,10 @@ async def chat_with_sales_agent(req: MessageList, stream: bool = Query(False), a
         print(f"TOOLS?: {sales_api.sales_agent.use_tools}")
         sessions[req.session_id] = sales_api
 
-    # TODO stream not working
+    print("\n\n\n\n\n\n")
+    print(datetime.now() - start)
+    print("\n\n\n\n\n\n")
+    # TO DO stream not working
     if stream:
 
         async def stream_response():
@@ -129,6 +131,7 @@ async def chat_with_sales_agent(req: MessageList, stream: bool = Query(False), a
     else:
         response = await sales_api.do(req.human_say)
         return response
+    
 
 
 # Main entry point

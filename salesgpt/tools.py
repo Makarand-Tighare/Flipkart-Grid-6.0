@@ -20,17 +20,17 @@ def setup_knowledge_base(
     """
     We assume that the product catalog is simply a text string.
     """
+    if not product_catalog:
+        raise ValueError("Product catalog path must be provided and cannot be None.")
+
     # load product catalog
     with open(product_catalog, "r") as f:
         product_catalog = f.read()
 
     text_splitter = CharacterTextSplitter(chunk_size=5000, chunk_overlap=200)
-    print(text_splitter)
-    print(product_catalog)
-    print("\n\n\n\n\n")
     texts = text_splitter.split_text(product_catalog)
 
-    llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
+    llm = ChatOpenAI(model_name=model_name, temperature=0)
 
     embeddings = OpenAIEmbeddings()
     docsearch = Chroma.from_texts(
@@ -247,6 +247,13 @@ def generate_calendly_invitation_link(query):
         return f"url: {data['resource']['booking_url']}"
     else:
         return "Failed to create Calendly link: "
+    
+def get_related_products(query) :
+    
+    print("\n\n\n\n\n")
+    print("Get related products called")
+    print(query)
+    print("\n\n\n\n\n")
 
 def get_tools(product_catalog):
     # query to get_tools can be used to be embedded and relevant tools found
@@ -276,7 +283,14 @@ def get_tools(product_catalog):
             func=generate_calendly_invitation_link,
             description='''Useful for when you need to create invite for a personal meeting in Sleep Heaven shop. 
             Sends a calendly invitation based on the query input.''',
+        ),
+        Tool(
+            name="GetRelatedProducts",
+            func=get_related_products,
+            description='''Useful for when you need to provide the user with related products''',
         )
     ]
 
     return tools
+
+

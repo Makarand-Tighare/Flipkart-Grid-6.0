@@ -68,7 +68,7 @@ class SalesGPT(Chain):
     model_name: str = "gpt-4o-mini-0613"  # TODO - make this an env variable
 
     use_tools: bool = False
-    salesperson_name: str = "Ted Lasso"
+    salesperson_name: str = "Flippi"
     salesperson_role: str = "Business Development Representative"
     company_name: str = "Flipkart"
     company_business: str = "Flipkart is a leading e-commerce platform in India, offering a wide range of products including electronics, fashion, home essentials, groceries, and lifestyle products. We are committed to providing our customers with the best online shopping experience by offering high-quality products, competitive prices, and exceptional customer service."
@@ -596,8 +596,8 @@ class SalesGPT(Chain):
         knowledge_base = None
 
         if use_tools:
-            product_catalog = kwargs.pop("product_catalog", None)
-            tools = get_tools(product_catalog)
+            product_catalog_path = "examples/sample_product_catalog.txt"
+            tools = get_tools(product_catalog_path)
 
             prompt = CustomPromptTemplateForTools(
                 template=SALES_AGENT_TOOLS_PROMPT,
