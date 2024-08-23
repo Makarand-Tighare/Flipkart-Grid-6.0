@@ -11,8 +11,6 @@ from pydantic import BaseModel
 
 from salesgpt.salesgptapi import SalesGPTAPI
 
-from datetime import datetime
-
 # Load environment variables
 load_dotenv()
 
@@ -92,8 +90,7 @@ async def chat_with_sales_agent(req: MessageList, stream: bool = Query(False), a
     Note:
         Streaming functionality is planned but not yet available. The current implementation only supports synchronous responses.
     """
-    start = datetime.now()
-
+    
     sales_api = None
     if os.getenv("ENVIRONMENT") == "production":
         get_auth_key(authorization)
@@ -115,10 +112,6 @@ async def chat_with_sales_agent(req: MessageList, stream: bool = Query(False), a
         print(f"TOOLS?: {sales_api.sales_agent.use_tools}")
         sessions[req.session_id] = sales_api
 
-    print("\n\n\n\n\n\n")
-    print(datetime.now() - start)
-    print("\n\n\n\n\n\n")
-    # TO DO stream not working
     if stream:
 
         async def stream_response():

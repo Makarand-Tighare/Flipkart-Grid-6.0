@@ -1,6 +1,5 @@
 import json
 import os
-
 import boto3
 import requests
 from langchain.agents import Tool
@@ -13,6 +12,11 @@ from litellm import completion
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from Product_API.Crawler import Get_Related_Post,Get_Product_Details,generate_paragraph
+
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 def setup_knowledge_base(
     product_catalog: str = None, model_name: str = "gpt-4o-mini"
@@ -250,10 +254,33 @@ def generate_calendly_invitation_link(query):
     
 def get_related_products(query) :
     
+    print("Get related product function called\n\n\n\n\n\n")
+    url = "https://www.flipkart.com/search?q=" + query
+
+    for _ in range(3):
+        order_details = Get_Related_Post(url)
+        if order_details:
+            break
+
+    formatted_response = ""
+    for index, order in enumerate(order_details):
+        for _ in range(3):
+            product_details = Get_Product_Details(order['Product_URL'])
+            if product_details:
+                break
+        
+        Product_summery = generate_paragraph(product_details)
+
+        formatted_response += f"Product Name {index}: {order['Product_Name']}\nProduct Url: {order['Product_URL']}\nPrice: ₹{order['Current_Price']}\nDescription: {Product_summery}\n\n"
+    print(formatted_response)   
     print("\n\n\n\n\n")
-    print("Get related products called")
-    print(query)
-    print("\n\n\n\n\n")
+    with open(os.path.join(BASE_DIR, 'examples/sample_product_catalog.txt'), 'a', encoding='utf-8') as file:
+        file.write(formatted_response)
+
+    if len(formatted_response) > 0:
+        return f"Could you provide some specifications which your are looking in {query}"
+    else:
+        return f"We don't find any relevent products for {query} You can ask something else"
 
 def get_tools(product_catalog):
     # query to get_tools can be used to be embedded and relevant tools found
@@ -287,7 +314,7 @@ def get_tools(product_catalog):
         Tool(
             name="GetRelatedProducts",
             func=get_related_products,
-            description='''Useful for when you need to provide the user with related products''',
+            description="Retrieves a list of products related to a specific product. This is useful for recommending complementary or alternative products to users based on their preferences or previous purchases."
         )
     ]
 
