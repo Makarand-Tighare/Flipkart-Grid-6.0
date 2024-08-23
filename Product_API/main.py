@@ -7,8 +7,6 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-print(BASE_DIR)
-
 app = Flask(__name__)
 CORS(app)
 
@@ -106,9 +104,9 @@ def get_related_post():
                 
                 Product_summery = generate_paragraph(product_details)
 
-                formatted_response += f"Product Name {index}: {order['Product_Name']}\nProduct Url: {order['Product_URL']}\nPrice: ${order['Current_Price']}\nDescription: {Product_summery}\n\n"
+                formatted_response += f"Product Name {index}: {order['Product_Name']}\nProduct Url: {order['Product_URL']}\nPrice: ₹{order['Current_Price']}\nDescription: {Product_summery}\n\n"
                         
-            with open(os.path.join(BASE_DIR, 'examples/sample_product_catalog.txt'), 'w', encoding='utf-8') as file:
+            with open(os.path.join(BASE_DIR, 'examples/sample_product_catalog.txt'), 'a', encoding='utf-8') as file:
                 file.write(formatted_response)
 
             return jsonify(order_details), 200
