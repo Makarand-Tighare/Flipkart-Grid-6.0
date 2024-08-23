@@ -46,9 +46,9 @@ def Get_Related_Post(url: str):
 
     soup = bs(response.text, 'html.parser')
 
-    elements = soup.find_all("div", class_="_75nlfW")[:10]
+    elements = soup.find_all("div", class_="_75nlfW")
     if len(elements) == 0:
-        elements = soup.find_all("div", class_="slAVV4")[:10]
+        elements = soup.find_all("div", class_="slAVV4")
 
     results = []
     try:
@@ -77,6 +77,9 @@ def Get_Related_Post(url: str):
                     'Product_offer': offer_percentage,
                     'Product_URL':product_url
                 })
+
+                if(len(results) >= 10):
+                    break
                 
 
             except Exception as e:
@@ -275,3 +278,4 @@ def Get_Order_History(cookies):
         print("Bad request",response.status_code)    
 
     return Order_History
+
