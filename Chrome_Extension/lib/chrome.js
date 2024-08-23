@@ -225,11 +225,7 @@ app.tab = {
 
 // While clicking on the product the product link is opened in new tab
 
-// Function to check if the URL is a Flipkart URL
-// Function to check if the URL is a Flipkart URL
-function isFlipkartUrl(url) {
-  return url && url.includes("flipkart.com");
-}
+
 
 // // Function to extract the part of the URL needed for the API endpoint
 // function extractUrlPart(url) {
@@ -255,7 +251,7 @@ function isFlipkartUrl(url) {
 
 // Function to determine if the URL is for related posts
 function isRelatedPostUrl(url) {
-  return url.includes('/pr?sid=') && !url.includes('/p/');
+  return url.includes('/pr?sid=') || url.includes('search?q=');
 }
 
 // Function to determine if the URL is for product details
