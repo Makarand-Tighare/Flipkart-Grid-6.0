@@ -268,10 +268,10 @@ var config = {
     })
     .then(response => response.json())
     .then(data => {
-      console.log('Bot Response:', data.response);
+      console.log('Bot Response:', data);
 
       // Extract the bot's response text
-      const botResponse = data.response;
+      const botResponse = data;
 
       // Display the bot's message in the chat box
       addMessageToChatBox("bot", botResponse);

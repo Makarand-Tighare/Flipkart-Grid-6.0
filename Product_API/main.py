@@ -106,7 +106,7 @@ def get_related_post():
 
                 formatted_response += f"Product Name {index}: {order['Product_Name']}\nProduct Url: {order['Product_URL']}\nPrice: ₹{order['Current_Price']}\nDescription: {Product_summery}\n\n"
                         
-            with open(os.path.join(BASE_DIR, 'examples/sample_product_catalog.txt'), 'a', encoding='utf-8') as file:
+            with open(os.path.join(BASE_DIR, 'examples/sample_product_catalog.txt'), 'w', encoding='utf-8') as file:
                 file.write(formatted_response)
 
             return jsonify(order_details), 200
