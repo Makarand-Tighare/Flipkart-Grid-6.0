@@ -2,92 +2,109 @@ from datetime import datetime
 import re
 import requests
 from bs4 import BeautifulSoup as bs
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import time
+import random
 
 def generate_paragraph(info):
-    paragraph = []
+    # Initialize the paragraph as an empty string
+    paragraph = ""
 
-    if info.get("product_description"):
-        paragraph.append(f"{info['discount_percent']} ")
+    # Extract the information once
+    product_description = info.get("product_description")
+    original_price = info.get("original_price")
+    discount_percent = info.get("discount_percent")
+    rating = info.get("rating")
+    no_of_rating = info.get("no_of_rating")
+    no_of_reviews = info.get("no_of_reviews")
+    specs = info.get("specs")
 
-    if info.get("original_price") and info.get("discount_percent"):
-        paragraph.append(f"**Product has a discount of {info['discount_percent']} from the original price of {info['original_price']}.**")
+    # Append details to the paragraph string
+    if product_description:
+        paragraph += f"{discount_percent} "
 
-    if info.get("rating") and info.get("no_of_rating") and info.get("no_of_reviews"):
-        paragraph.append(f"**The product has a rating of {info['rating']} based on {info['no_of_rating']} ratings and {info['no_of_reviews']} reviews.**")
+    if original_price and discount_percent:
+        paragraph += f"**Product has a discount of {discount_percent} from the original price of {original_price}.** "
 
-    if info.get("highlights"):
-        paragraph.append(f"**Some of the key highlights include: {', '.join(info['highlights'])}.**")
+    if rating and no_of_rating and no_of_reviews:
+        paragraph += f"**The product has a rating of {rating} based on {no_of_rating} ratings and {no_of_reviews} reviews.** "
 
-    if info.get("offers"):
-        offers = [f"{offer['Offer_type']}: {offer['Offer_Description']}" for offer in info["offers"]]
-        paragraph.append(f"**Current offers available are: {', '.join(offers)}.**")
-
-    if info.get("specs"):
-        specs = []
-        for spec in info["specs"]:
+    if specs:
+        specs_details = []
+        for spec in specs:
             section_title = spec["title"]
-            section_details = ', '.join([f"{item['property']}: {item['value']}" for item in spec["details"]])
-            specs.append(f"{section_title} - {section_details}")
-        paragraph.append(f"**Specifications include: {'. '.join(specs)}.**")
+            section_details = ', '.join(f"{item['property']}: {item['value']}" for item in spec["details"])
+            specs_details.append(f"{section_title} - {section_details}")
+        # Append specs details to paragraph
+        paragraph += f"**Specifications include: {'. '.join(specs_details)}.**"
 
-    return ' '.join(paragraph)
-
+    return paragraph
 
 def Get_Related_Post(url: str):
     '''
-    Example Url
+    Example Urls provided for context:
 
     1. https://www.flipkart.com/search?q=tv&as=on&as-show=on&otracker=AS_Query_TrendingAutoSuggest_8_0_na_na_na&otracker1=AS_Query_TrendingAutoSuggest_8_0_na_na_na&as-pos=8&as-type=TRENDING&suggestionId=tv&requestId=cbf12b63-0b14-4eeb-b131-afc9e1695106
 
     2. https://www.flipkart.com/sports/cycling/electric-cycle/pr?sid=abc%2Culv%2Ctwp&hpid=IN6WQymhhksnM1l95t0Z6Kp7_Hsxr70nj65vMAAFKlc%3D&ctx=eyJjYXJkQ29udGV4dCI6eyJhdHRyaWJ1dGVzIjp7InZhbHVlQ2FsbG91dCI6eyJtdWx0aVZhbHVlZEF0dHJpYnV0ZSI6eyJrZXkiOiJ2YWx1ZUNhbGxvdXQiLCJpbmZlcmVuY2VUeXBlIjoiVkFMVUVfQ0FMTE9VVCIsInZhbHVlcyI6WyJVcCB0byA0MCUgT2ZmIl0sInZhbHVlVHlwZSI6Ik1VTFRJX1ZBTFVFRCJ9fSwiaGVyb1BpZCI6eyJzaW5nbGVWYWx1ZUF0dHJpYnV0ZSI6eyJrZXkiOiJoZXJvUGlkIiwiaW5mZXJlbmNlVHlwZSI6IlBJRCIsInZhbHVlIjoiRUNZSDJYNjQyQ0hYRERDViIsInZhbHVlVHlwZSI6IlNJTkdMRV9WQUxVRUQifX0sInRpdGxlIjp7Im11bHRpVmFsdWVkQXR0cmlidXRlIjp7ImtleSI6InRpdGxlIiwiaW5mZXJlbmNlVHlwZSI6IlRJVExFIiwidmFsdWVzIjpbIkVsZWN0cmljIEN5Y2xlIl0sInZhbHVlVHlwZSI6Ik1VTFRJX1ZBTFVFRCJ9fX19fQ%3D%3D
-
     '''
-    response = requests.get(url)
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Ensure the request was successful
+    except requests.exceptions.RequestException as e:
+        print(f"Request failed: {e}")
+        return []
 
     soup = bs(response.text, 'html.parser')
 
-    elements = soup.find_all("div", class_="_75nlfW")
-    if len(elements) == 0:
-        elements = soup.find_all("div", class_="slAVV4")
+    # Search for elements with the two possible classes in one go
+    elements = soup.find_all("div", class_=["_75nlfW", "slAVV4"])
 
     results = []
-    try:
-        for element in elements:
-            try:
-                product_url = "https://www.flipkart.com" + element.find("a")['href']
-                offer_percentage = element.find("span", string=lambda text: text and "% off" in text).text.replace('off', '').replace('%', '')
-                curr_price = element.find("div", class_="Nx9bqj").text[1:].replace(',', '')
-                mrp_price = element.find("div", class_="yRaY8j").text[1:].replace(',', '')
 
-                try:
-                    name = element.find("a", class_="WKTcLC")['title']
-                except:
-                    name = element.find("img", class_="DByuf4")['alt']
+    for element in elements:
+        try:
+            product_url = "https://www.flipkart.com" + element.find("a")['href']
 
-                try:
-                    rating = element.find('div', attrs={'class':'hGSR34'})
-                except:
-                    rating = None
+            offer_span = element.find("span", string=lambda text: text and "% off" in text)
+            offer_percentage = offer_span.text.replace('off', '').replace('%', '') if offer_span else None
 
-                results.append({
-                    'Product_Name': name,
-                    'Product_Rating': rating,
-                    'Current_Price': curr_price,
-                    'MRP_Price': mrp_price,
-                    'Product_offer': offer_percentage,
-                    'Product_URL':product_url
-                })
+            curr_price_div = element.find("div", class_="Nx9bqj")
+            curr_price = curr_price_div.text[1:].replace(',', '') if curr_price_div else None
 
-                if(len(results) >= 10):
-                    break
-                
+            mrp_price_div = element.find("div", class_="yRaY8j")
+            mrp_price = mrp_price_div.text[1:].replace(',', '') if mrp_price_div else None
 
-            except Exception as e:
-                print(f"Error processing element: {e}")
-                continue
+            name = None
+            name_tag = element.find("a", class_="WKTcLC")
+            if name_tag:
+                name = name_tag.get('title')
+            else:
+                img_tag = element.find("img", class_="DByuf4")
+                if img_tag:
+                    name = img_tag.get('alt')
 
-    except:
-        return results
+            rating_div = element.find('div', class_='hGSR34')
+            rating = rating_div.text if rating_div else None
+
+            results.append({
+                'Product_Name': name,
+                'Product_Rating': rating,
+                'Current_Price': curr_price,
+                'MRP_Price': mrp_price,
+                'Product_offer': offer_percentage,
+                'Product_URL': product_url
+            })
+
+            if len(results) >= 10:
+                break
+
+        except Exception as e:
+            print(f"Error processing element: {e}")
+            continue
 
     return results
 
@@ -280,3 +297,117 @@ def Get_Order_History(cookies):
 
     return Order_History
 
+
+def order_product(upi_id, pin_code, product_url):
+    chrome_user_data_path = r"C:\Users\vivek\AppData\Local\Google\Chrome\User Data"
+
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument(f"user-data-dir={chrome_user_data_path}")
+    chrome_options.add_argument("--profile-directory=Default")
+
+    driver = webdriver.Chrome(options=chrome_options)
+
+    try:
+        # Open product URL
+        driver.get(product_url)
+
+        time.sleep(random.randint(3, 5))
+
+        # Maximize window
+        driver.maximize_window()
+
+        # Enter pincode and click check
+        pincode_input = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "pincodeInputId"))
+        )
+        pincode_input.clear()
+        pincode_input.send_keys(pin_code)
+
+        check_button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.CLASS_NAME, "i40dM4"))
+        )
+        check_button.click()
+
+        time.sleep(5)
+
+        # Click buy now button
+        buy_now_button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'QqFHMw') and contains(@class, 'vslbG+') and contains(@class, '_3Yl67G') and contains(@class, '_7Pd1Fp')]"))
+        )
+        buy_now_button.click()
+
+        time.sleep(3)
+
+        # Click Deliver Here button
+        deliver_here_button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//button[text()='Deliver Here']"))
+        )
+        deliver_here_button.click()
+
+        time.sleep(2)
+
+        # Click Continue button
+        continue_button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//button[text()='CONTINUE']"))
+        )
+        continue_button.click()
+
+        try:
+            # Click Accept & Continue button if it appears
+            accept_continue_button = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, "//button[text()='Accept & Continue']"))
+            )
+            accept_continue_button.click()
+        except:
+            print("No agreement found")
+
+        time.sleep(8)
+
+        # Select payment method
+        payment_div_elements = WebDriverWait(driver, 10).until(
+            EC.presence_of_all_elements_located((By.XPATH, "//div[contains(@class, 'Pg+ADy') and contains(@class, 'SC+loY')]"))
+        )
+        upi_input = payment_div_elements[1].find_element(By.XPATH, ".//label")
+        upi_input.click()
+        time.sleep(3)
+
+        try:
+            upi_id_radio = WebDriverWait(driver, 10).until(
+                EC.presence_of_all_elements_located((By.XPATH, "//div[contains(@class, '_9-suWS')]"))
+            )[2]
+            upi_id_inner_tag = upi_id_radio.find_elements(By.XPATH, ".//div[contains(@class, 'jIbgdC')]")
+            upi_id_tag = upi_id_inner_tag[1]
+            upi_id_tag.click()
+        except:
+            upi_id_div = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, "//div[contains(@class, 'jIbgdC') and contains(text(), 'Your UPI ID')]"))
+            )
+            upi_id_div.click()
+
+        time.sleep(3)
+
+        # Input UPI ID
+        upi_input_tag = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//input[@name='upi-id' and contains(@class, 'v2VFa-') and contains(@class, 'z2D4XG')]"))
+        )
+        upi_input_tag.send_keys(upi_id)
+
+        # Click Verify button
+        verify_upi = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//div[contains(@class, 'L0cDUo') and contains(text(), 'Verify')]"))
+        )
+        verify_upi.click()
+        time.sleep(5)
+
+        # Click Pay button
+        pay_button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'QqFHMw') and contains(@class, 'cLLuYN') and contains(@class, '_7Pd1Fp') and contains(text(), 'PAY')]"))
+        )
+        pay_button.click()
+
+        # Wait for completion
+        time.sleep(5 * 60)
+
+    finally:
+        time.sleep(5)
+        driver.quit()
