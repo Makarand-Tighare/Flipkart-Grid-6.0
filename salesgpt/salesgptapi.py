@@ -5,6 +5,7 @@ import re
 from langchain_community.chat_models import BedrockChat, ChatLiteLLM
 from langchain_openai import ChatOpenAI
 
+import requests
 from salesgpt.agents import SalesGPT
 from salesgpt.models import BedrockCustomModel
 
@@ -53,9 +54,9 @@ class SalesGPTAPI:
                 {
                     "use_tools": True,
                     "product_catalog": self.product_catalog,
-                    "salesperson_name": "Ted Lasso"
+                    "salesperson_name": "Flippi"
                     if not self.config_path
-                    else config.get("salesperson_name", "Ted Lasso"),
+                    else config.get("salesperson_name", "Flippi"),
                 }
             )
 
@@ -74,12 +75,26 @@ class SalesGPTAPI:
                 "BOT",
                 "In case you'll have any questions - just text me one more time!",
             ]
-
+        
+        # Check if the human input requires product information
         if human_input is not None:
-            self.sales_agent.human_step(human_input)
+            product_name = self.is_product_query(human_input)
+            if product_name:
+                # Example check: Assuming `self.product_catalog` contains a list or dict of known products
+                if not self.is_product_available(human_input):
+                    print(f"Product not found in catalog: {human_input}. Fetching from API...")
+                    product_info = self.fetch_product_info_from_api(human_input)
+                    if product_info:
+                        self.update_product_catalog(human_input, product_info)
+                    else:
+                        print(f"Could not fetch product information for: {human_input}")
+                        return ["BOT", "Sorry, I couldn't find information on that product."]
+            else:    
+                self.sales_agent.human_step(human_input)
 
         ai_log = await self.sales_agent.astep(stream=False)
         await self.sales_agent.adetermine_conversation_stage()
+
         # TODO - handle end of conversation in the API - send a special token to the client?
         if self.verbose:
             print("=" * 10)
@@ -150,6 +165,57 @@ class SalesGPTAPI:
             "model_name": self.model_name,
         }
         return payload
+    
+    def is_product_available(self, product_name):
+        # Example logic to check if product is in catalog
+        with open(self.product_catalog, "r") as f:
+            catalog = f.read()
+        return product_name.lower() in catalog.lower()
+
+    def fetch_product_info_from_api(self, product_name):
+        # Replace with your API call logic
+        base_url = "https://www.flipkart.com/search?q="
+        full_url = base_url + product_name
+        print(full_url)
+        response = requests.post("http://127.0.0.1:5000/get_related_post", json={"url": full_url})
+        if response.status_code == 200:
+            return response.json()
+        return None
+
+    def update_product_catalog(self, product_name, product_info):
+        # Example logic to update catalog
+        with open(self.product_catalog, "a") as f:
+            formatted_info = f"{product_name}: {json.dumps(product_info)}\n"
+            f.write(formatted_info)
+    
+    def is_product_query(self, query):
+        # Define a condition to determine if the query is related to a product
+        product_keywords = ["find", "look for", "search for", "show me", "details about", "information on", "available", "options for","suggest me"]
+        if any(keyword in query.lower() for keyword in product_keywords):
+            return self.extract_product_name(query)
+        return None
+    
+    def extract_product_name(self, query):
+    # Example function to extract product name from the query
+    # This can be enhanced with more sophisticated NLP techniques if needed
+    # For simplicity, we assume the product name is the part of the query after certain keywords
+    
+    # Define keywords to determine where the product name starts
+        product_keywords = ["find", "look for", "search for", "show me", "details about", "information on", "available", "options for","suggest me"]
+
+    
+    # Find where the product-related part starts
+        for keyword in product_keywords:
+            if keyword in query.lower():
+             # Extract the part of the query after the keyword
+                parts = re.split(r'\b' + keyword + r'\b', query, flags=re.IGNORECASE)
+                if len(parts) > 1:
+                    # Return the part of the query after the keyword, trimmed
+                    return parts[1].strip()
+    
+    # If no keywords found, return the full query (or handle as needed)
+        return query.strip()
+
 
     async def do_stream(self, conversation_history: [str], human_input=None):
         # TODO
