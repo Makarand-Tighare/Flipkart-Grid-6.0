@@ -314,7 +314,7 @@ def get_tools(product_catalog):
         Tool(
             name="GetRelatedProducts",
             func=get_related_products,
-            description="Retrieves a list of products related to a specific product. This is useful for recommending complementary or alternative products to users based on their preferences or previous purchases."
+            description="Useful for when you need to retrieves a list of products related to a specific product. This is useful for recommending complementary or alternative products to users based on their preferences or previous purchases."
         )
     ]
 
