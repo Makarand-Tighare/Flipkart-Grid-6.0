@@ -301,15 +301,18 @@ def Get_Order_History(cookies):
 
 
 def order_product(upi_id, pin_code, product_url):
-    chrome_user_data_path = r"C:\Users\vivek\AppData\Local\Google\Chrome\User Data"
+    brave_user_data_path = r"C:\Users\vivek\AppData\Local\BraveSoftware\Brave-Browser\User Data"
     brave_path = r"C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe"
 
+    # Setup Chrome options to use Brave browser
     chrome_options = Options()
     chrome_options.binary_location = brave_path
-    chrome_options.add_argument(f"user-data-dir={chrome_user_data_path}")
-    chrome_options.add_argument("--profile-directory=Default")
+    chrome_options.add_argument(f"user-data-dir={brave_user_data_path}")
+    chrome_options.add_argument("--profile-directory=Default")  # Change "Default" to the profile you want to use if needed
 
+    # Initialize the WebDriver for Brave
     driver = webdriver.Chrome(options=chrome_options)
+
 
     try:
         # Open product URL
@@ -416,4 +419,4 @@ def order_product(upi_id, pin_code, product_url):
         time.sleep(5)
         driver.quit()
 
-order_product('123@abc', '440024', 'https://www.flipkart.com/intern-int-kb-61-keys-touch-response-portable-piano-keyboard-mic-5v-power-adapter-digital/p/itm618de5a206706?pid=MKDGZZGHD2W82XDP&lid=LSTMKDGZZGHD2W82XDPTXOPGX&marketplace=FLIPKART&store=ypu%2Fnvg%2Fxqg&srno=b_1_1&otracker=browse&fm=organic&iid=en_ZHO0fKk7j3OiPTGIVJeR9JqIiK7Ic70qmLtMfwVD9Ax7wR9nsqCjT8JjR6k1zblTVOaYSXs54FuG3tVrpLTjrA%3D%3D&ppt=browse&ppn=browse&ssid=hs67nenxeo0000001724452731502')
+# order_product('7387026440@ibl', '440024', 'https://www.flipkart.com/ajn-flair-ezee-click-ball-pen/p/itm525416930e650?pid=PENGHSA8UGJVQKNW&cmpid=product.share.pp&_refId=PP.cc6bb72a-9e89-4b7e-b8a3-1d8d3e43dd2b.PENGHSA8UGJVQKNW&_appId=WA')

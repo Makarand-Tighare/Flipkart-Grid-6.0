@@ -209,7 +209,7 @@ var config = {
   
 
   "callGoogleTTS": async function (text) {
-    const apiKey = 'AIzaSyBxYQqW_QcvJD4NpmmGvJzubwKL-b6jMyw';
+    const apiKey = 'AIzaSyDC2XpkaCPv0sdH77cDjL-_Zn4yF7n3PpQ';
     const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`;
 
     const requestData = {

@@ -89,7 +89,7 @@ async def chat_with_sales_agent(req: MessageList, stream: bool = Query(False), a
 
     Note:
         Streaming functionality is planned but not yet available. The current implementation only supports synchronous responses.
-    """
+    """  
     
     sales_api = None
     if os.getenv("ENVIRONMENT") == "production":

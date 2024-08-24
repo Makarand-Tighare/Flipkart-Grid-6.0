@@ -334,7 +334,7 @@ def get_tools(product_catalog):
         Tool(
             name="GetRelatedProducts",
             func=get_related_products,
-            description="Use this tool when the ProductSearch function does not find the desired product in the catalog. It helps retrieve a list of related products from external sources like Flipkart, based on the user's preferences or query."
+            description="Use this tool when the ProductSearch function does not find any product or the desired product is not in the catalog. It helps retrieve a list of related products from external sources like Flipkart, based on the user's preferences or query."
         ),
         Tool(
             name="OrderProduct",
