@@ -17,6 +17,9 @@ function addMessageToChatBox(sender, message) {
   chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom
 }
 
+
+
+
 var isCancelled = false;
 
 
@@ -300,11 +303,6 @@ var config = {
       console.error('Error:', error);
     });
 },
-
-
-
-
-
 
   "resize": {
     "timeout": null,
@@ -597,6 +595,11 @@ var config = {
     }
   }
 };
+
+document.addEventListener('DOMContentLoaded', (event) => {
+  // Trigger the hello command on page load
+  config.callApi("Hello, Flippi! How can you help me today?");
+});
 
 config.port.connect();
 

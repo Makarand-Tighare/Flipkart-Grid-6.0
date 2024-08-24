@@ -45,7 +45,7 @@ table {
 }
 
 .container {
-  height: 90.9%; 
+  height: 82%; 
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -54,7 +54,15 @@ table {
 }
 
 
-
+.header {
+  background-color: #2874F0; /* Flipkart blue */
+  color: #FFC000; /* Flipkart yellow */
+  text-align: center;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  font-size: 24px;
+  font-weight: bold;
+}
 
 #user-input {
   width: calc(100% - 80px);
@@ -352,7 +360,10 @@ table {
 
 @media (max-width: 650px) {
   .container{
-    height: 88%;
+    height: 75%;
+  }
+  .console{
+    height: 8%;
   }
 }
 
