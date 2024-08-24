@@ -274,7 +274,7 @@ def get_related_products(query) :
 
         formatted_response += f"Product Name {index}: {order['Product_Name']}\nProduct Url: {order['Product_URL']}\nPrice: ₹{order['Current_Price']}\nDescription: {Product_summery}\n\n"
 
-    with open(os.path.join(BASE_DIR, 'examples/sample_product_catalog.txt'), 'a', encoding='utf-8') as file:
+    with open(os.path.join(BASE_DIR, 'examples/sample_product_catalog.txt'), 'w', encoding='utf-8') as file:
         file.write(formatted_response)
 
     success_messages = [
@@ -292,12 +292,17 @@ def OrderProduct(query):
     details = query.split(",")
     print(details)
     print("\n\n\n\n\n\n")
-    if(len(details) == 3) :
-        thread = threading.Thread(target=order_product, args=(details[1], details[2], details[0]))
-        thread.start()
-        return f"Your order has been placed succesfully"
-    else : 
-        return f"Please provide UPI id and postal code"
+    try:
+        upi_id = details[1].replace(" ","")
+        postal_code = details[2].replace(" ","")
+        if(len(postal_code) == 6):
+            thread = threading.Thread(target=order_product, args=(details[1], details[2], details[0]))
+            thread.start()
+            return f"Your order has been placed succesfully"
+        else : 
+            return f"Please provide valid UPI id and postal code"
+    except:
+        return f"Error occured during product order please try later"
 
 
 def get_tools(product_catalog):
@@ -337,12 +342,8 @@ def get_tools(product_catalog):
         Tool(
             name="OrderProduct",
             func=OrderProduct,
-            description="Use this tool to place an order when a user wants to buy a product. The **input must always be the product URL followed by UPI id followed by postal code comma seperated**. If required details like the UPI ID or postal code are missing, ask the user for these details. Once the product URL, UPI ID, and postal code are provided, proceed to complete the purchase using this tool. Dont use the upi id or postal code on your own or pass them as blank"
+            description=" Use : 'Use this tool to place an order when a user wants to buy or purchase or make a order for a product.' If UPI id & postal code is not provided ask for it strictly.  The **input must always be the product URL followed by UPI id followed by postal code comma seperated**. If required details like the UPI ID or postal code are missing, ask the user for these details. Once the product URL, UPI ID, and postal code are provided, proceed to complete the purchase using this tool. Dont use the upi id or postal code on your own or pass them as blank"
         )
-
-
-
-
     ]
 
     return tools
