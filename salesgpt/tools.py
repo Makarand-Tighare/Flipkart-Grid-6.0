@@ -1,6 +1,7 @@
 import json
 import os
 import random
+import threading
 import boto3
 import requests
 from langchain.agents import Tool
@@ -292,7 +293,8 @@ def OrderProduct(query):
     print(details)
     print("\n\n\n\n\n\n")
     if(len(details) == 3) :
-        order_product(details[1], details[2], details[0])
+        thread = threading.Thread(target=order_product, args=(details[1], details[2], details[0]))
+        thread.start()
         return f"Your order has been placed succesfully"
     else : 
         return f"Please provide UPI id and postal code"

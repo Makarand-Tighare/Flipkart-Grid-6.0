@@ -413,5 +413,3 @@ def order_product(upi_id, pin_code, product_url):
     finally:
         time.sleep(5)
         driver.quit()
-
-order_product('123@abc', '440024', 'https://www.flipkart.com/intern-int-kb-61-keys-touch-response-portable-piano-keyboard-mic-5v-power-adapter-digital/p/itm618de5a206706?pid=MKDGZZGHD2W82XDP&lid=LSTMKDGZZGHD2W82XDPTXOPGX&marketplace=FLIPKART&store=ypu%2Fnvg%2Fxqg&srno=b_1_1&otracker=browse&fm=organic&iid=en_ZHO0fKk7j3OiPTGIVJeR9JqIiK7Ic70qmLtMfwVD9Ax7wR9nsqCjT8JjR6k1zblTVOaYSXs54FuG3tVrpLTjrA%3D%3D&ppt=browse&ppn=browse&ssid=hs67nenxeo0000001724452731502')
