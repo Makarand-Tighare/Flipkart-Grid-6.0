@@ -3,8 +3,6 @@ import json
 import re
 from langchain_community.chat_models import BedrockChat, ChatLiteLLM
 from langchain_openai import ChatOpenAI
-
-import requests
 from salesgpt.agents import SalesGPT
 from salesgpt.models import BedrockCustomModel
 
@@ -17,19 +15,13 @@ class SalesGPTAPI:
         max_num_turns: int = 20,
         model_name: str = "gpt-4o-mini",
         product_catalog_path: str = "examples/sample_product_catalog.txt",
+        product_catalog: str = "examples/sample_product_catalog.txt",
         use_tools=True,
     ):
         self.config_path = config_path
         self.verbose = verbose
         self.max_num_turns = max_num_turns
         self.model_name = model_name
-        self.use_tools = use_tools
-        self.product_catalog_path = product_catalog_path
-        self.product_catalog = self.load_product_catalog()
-        self.conversation_history = []
-        self.current_turn = 0
-
-        # Initialize the LLM based on the model name
         if "anthropic" in model_name:
             self.llm = BedrockCustomModel(
                 type="bedrock-model",
@@ -38,45 +30,19 @@ class SalesGPTAPI:
             )
         else:
             self.llm = ChatLiteLLM(temperature=0.2, model=model_name)
-
-        # Initialize the sales agent
+        self.product_catalog = product_catalog
+        self.conversation_history = []
+        self.use_tools = use_tools
         self.sales_agent = self.initialize_agent()
-
-    def load_product_catalog(self):
-        # Load the product catalog into a dictionary
-        product_catalog = {}
-        with open(self.product_catalog_path, 'r') as f:
-            current_product = None
-            for line in f:
-                try:
-                    if line.startswith("Product Name"):
-                        current_product = line.strip().split(": ", 1)[1]
-                        product_catalog[current_product] = {"description": "", "url": "", "price": ""}
-                    elif line.startswith("Product Url"):
-                        product_catalog[current_product]["url"] = line.strip().split(": ", 1)[1]
-                    elif line.startswith("Price"):
-                        product_catalog[current_product]["price"] = line.strip().split(": ", 1)[1]
-                    elif line.startswith("Description"):
-                        product_catalog[current_product]["description"] += line.strip().split(": ", 1)[1]
-                    else:
-                        product_catalog[current_product]["description"] += line.strip()
-                except Exception as e:
-                    print(e)
-
-        return product_catalog
+        self.current_turn = 0
 
     def initialize_agent(self):
         config = {"verbose": self.verbose}
         if self.config_path:
-            try:
-                with open(self.config_path, "r") as f:
-                    config.update(json.load(f))
-                if self.verbose:
-                    print(f"Loaded agent config: {config}")
-            except FileNotFoundError:
-                print(f"Config file not found at {self.config_path}. Using default configuration.")
-            except json.JSONDecodeError:
-                print(f"Error decoding JSON from config file. Please check the file format.")
+            with open(self.config_path, "r") as f:
+                config.update(json.load(f))
+            if self.verbose:
+                print(f"Loaded agent config: {config}")
         else:
             print("Default agent config in use")
 
@@ -85,18 +51,14 @@ class SalesGPTAPI:
             config.update(
                 {
                     "use_tools": True,
-                    "product_catalog_path": self.product_catalog_path,
-                    "salesperson_name": "Flippi"
+                    "product_catalog": self.product_catalog,
+                    "salesperson_name": "Ted Lasso"
                     if not self.config_path
-                    else config.get("salesperson_name", "Flippi"),
+                    else config.get("salesperson_name", "Ted Lasso"),
                 }
             )
 
-        try:
-            sales_agent = SalesGPT.from_llm(self.llm, **config)
-        except AttributeError as e:
-            print(f"Error initializing SalesGPT: {e}")
-            raise
+        sales_agent = SalesGPT.from_llm(self.llm, **config)
 
         print(f"SalesGPT use_tools: {sales_agent.use_tools}")
         sales_agent.seed_agent()
@@ -104,34 +66,30 @@ class SalesGPTAPI:
 
     async def do(self, human_input=None):
         self.current_turn += 1
-        if self.current_turn >= self.max_num_turns:
+        current_turns = self.current_turn
+        if current_turns >= self.max_num_turns:
             print("Maximum number of turns reached - ending the conversation.")
             return [
                 "BOT",
                 "In case you'll have any questions - just text me one more time!",
             ]
 
-        if human_input:
-            product_name = self.is_product_query(human_input)
-            if product_name:
-                # Use RAG to generate response
-                response = self.retrieve_and_generate(product_name)
-                return response
-
+        if human_input is not None:
             self.sales_agent.human_step(human_input)
 
         ai_log = await self.sales_agent.astep(stream=False)
         await self.sales_agent.adetermine_conversation_stage()
-
+        # TODO - handle end of conversation in the API - send a special token to the client?
         if self.verbose:
             print("=" * 10)
             print(f"AI LOG {ai_log}")
-
+            
         if (
             self.sales_agent.conversation_history
             and "<END_OF_CALL>" in self.sales_agent.conversation_history[-1]
         ):
             print("Sales Agent determined it is time to end the conversation.")
+            # strip end of call for now
             self.sales_agent.conversation_history[
                 -1
             ] = self.sales_agent.conversation_history[-1].replace("<END_OF_CALL>", "")
@@ -141,42 +99,57 @@ class SalesGPTAPI:
             if self.sales_agent.conversation_history
             else ""
         )
-        cleaned_reply = reply.replace('`', '')
-        response = ": ".join(cleaned_reply.split(": ")[1:]).rstrip("<END_OF_TURN>")
+        #print("AI LOG INTERMEDIATE STEPS: ", ai_log["intermediate_steps"])
 
-        return response
-
-    def is_product_query(self, query):
-        product_keywords = ["find", "look for", "search for", "show me", "details about", "information on", "available", "options for", "suggest me"]
-        if any(keyword in query.lower() for keyword in product_keywords):
-            return self.extract_product_name(query)
-        return None
-
-    def extract_product_name(self, query):
-        product_keywords = ["find", "look for", "search for", "show me", "details about", "information on", "available", "options for", "suggest me"]
-        for keyword in product_keywords:
-            if keyword in query.lower():
-                parts = re.split(r'\b' + keyword + r'\b', query, flags=re.IGNORECASE)
-                if len(parts) > 1:
-                    return parts[1].strip()
-        return query.strip()
-
-    def retrieve_and_generate(self, product_name):
-        # Search the product catalog
-        matching_product = next(
-            (product for product in self.product_catalog.keys() if product_name.lower() in product.lower()), 
-            None
-        )
-        if matching_product:
-            product_info = self.product_catalog[matching_product]
-            # Combine retrieval and generation using the LLM
-            response = f"Here is what I found about {matching_product}: {product_info['description']}. You can view more details [here]({product_info['url']}). The price is {product_info['price']}."
+        if (
+            self.use_tools and 
+            "intermediate_steps" in ai_log and 
+            len(ai_log["intermediate_steps"]) > 0
+        ):
+            
+            try:
+                res_str = ai_log["intermediate_steps"][0]
+                print("RES STR: ", res_str)
+                agent_action = res_str[0]
+                tool, tool_input, log = (
+                    agent_action.tool,
+                    agent_action.tool_input,
+                    agent_action.log,
+                )
+                actions = re.search(r"Action: (.*?)[\n]*Action Input: (.*)", log)
+                action_input = actions.group(2)
+                action_output =  res_str[1]
+                if tool_input == action_input:
+                    action_input=""
+                    action_output = action_output.replace("<web_search>", "<a href='https://www.google.com/search?q=")
+                    action_output = action_output.replace("</web_search>", "' target='_blank' rel='noopener noreferrer'>")
+            except Exception as e:
+                print("ERROR: ", e)
+                tool, tool_input, action, action_input, action_output = (
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                )
         else:
-            response = "Sorry, I couldn't find information on that product. Please try another query."
-        return ["BOT", response]
+            tool, tool_input, action, action_input, action_output = "", "", "", "", ""
+
+        print(reply)
+        payload = {
+            "bot_name": reply.split(": ")[0],
+            "response": ": ".join(reply.split(": ")[1:]).rstrip("<END_OF_TURN>"),
+            "conversational_stage": self.sales_agent.current_conversation_stage,
+            "tool": tool,
+            "tool_input": tool_input,
+            "action_output": action_output,
+            "action_input": action_input,
+            "model_name": self.model_name,
+        }
+        return payload
 
     async def do_stream(self, conversation_history: [str], human_input=None):
-        # This method provides streaming responses (for real-time interactions)
+        # TODO
         current_turns = len(conversation_history) + 1
         if current_turns >= self.max_num_turns:
             print("Maximum number of turns reached - ending the conversation.")
@@ -193,7 +166,7 @@ class SalesGPTAPI:
             self.sales_agent.human_step(human_input)
 
         stream_gen = self.sales_agent.astep(stream=True)
-        async for model_response in stream_gen:
+        for model_response in stream_gen:
             for choice in model_response.choices:
                 message = choice["delta"]["content"]
                 if message is not None:
@@ -205,7 +178,6 @@ class SalesGPTAPI:
                             "BOT",
                             "In case you'll have any questions - just text me one more time!",
                         ]
-                        return
                     yield message
                 else:
                     continue

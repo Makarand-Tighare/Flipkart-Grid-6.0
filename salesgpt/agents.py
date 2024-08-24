@@ -76,7 +76,6 @@ class SalesGPT(Chain):
     conversation_purpose: str = "understand the prospect's needs and explore how Flipkart's products can meet those needs."
     conversation_type: str = "call"
 
-
     def retrieve_conversation_stage(self, key):
         """
         Retrieves the conversation stage based on the provided key.
@@ -596,8 +595,8 @@ class SalesGPT(Chain):
         knowledge_base = None
 
         if use_tools:
-            product_catalog_path = "examples/sample_product_catalog.txt"
-            tools = get_tools(product_catalog_path)
+            product_catalog = kwargs.pop("product_catalog", None)
+            tools = get_tools(product_catalog)
 
             prompt = CustomPromptTemplateForTools(
                 template=SALES_AGENT_TOOLS_PROMPT,
