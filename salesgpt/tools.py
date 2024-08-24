@@ -263,8 +263,11 @@ def get_related_products(query) :
         if order_details:
             break
 
+    found_products = ""
+
     formatted_response = ""
     for index, order in enumerate(order_details):
+        found_products += order['Product_Name'] + "\n"
         for _ in range(3):
             product_details = Get_Product_Details(order['Product_URL'])
             if product_details:
@@ -277,14 +280,8 @@ def get_related_products(query) :
     with open(os.path.join(BASE_DIR, 'examples/sample_product_catalog.txt'), 'w', encoding='utf-8') as file:
         file.write(formatted_response)
 
-    success_messages = [
-        f"Could you please provide some more specifications or details about {query}? This will help me to better understand what you're looking for and find the perfect product for you.",
-        f"Could you please provide some additional specifications or details about your product request? This will help us better understand your needs and ensure we recommend the most suitable products or services for you.",
-        f"Could you please provide more specific details about what you're looking for in your product? This will help us better understand your needs and suggest the most suitable products for you.",
-        f"Could you share a few more details about what you're looking for in your product? This will help us find the best products that match your needs."
-    ]
     if len(formatted_response) > 0:
-        return random.choice(success_messages)
+        return f"we found some amezing products for you\n{found_products}\n\nplease specify the product name to get more details"
     else:
         return f"We don't find any relevent products for {query} You can ask something else"
     

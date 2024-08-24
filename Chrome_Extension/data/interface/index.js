@@ -209,7 +209,7 @@ var config = {
   
 
   "callGoogleTTS": async function (text) {
-    const apiKey = '';
+    const apiKey = 'AIzaSyBxYQqW_QcvJD4NpmmGvJzubwKL-b6jMyw';
     const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`;
 
     const requestData = {
@@ -246,7 +246,6 @@ var config = {
     }
   },
 
-   // Function to call API in end
    "callApi": function (transcript) {
     console.log(transcript);
 
@@ -274,21 +273,24 @@ var config = {
       console.log('Bot Response:', data);
 
       // Extract the bot's response text
-      const botResponse = data;
+      const botResponse = data.response;
+
+      // Clean the bot's response text by removing backticks and other unwanted characters
+      const cleanedBotResponse = botResponse.replace(/```/g, '');
 
       // Display the bot's message in the chat box
-      addMessageToChatBox("bot", botResponse);
+      addMessageToChatBox("bot", cleanedBotResponse);
 
       // Storing bot response
       const botKey = `bot_${session_id}`;
-      sessionStorage.setItem(botKey, botResponse);
+      sessionStorage.setItem(botKey, cleanedBotResponse);
 
-      // Call Google TTS
-      config.callGoogleTTS(botResponse);
+      // Call Google TTS with the cleaned response
+      config.callGoogleTTS(cleanedBotResponse);
 
       // Optional: Use browser's built-in TTS
       /*
-      const utterance = new SpeechSynthesisUtterance(botResponse);
+      const utterance = new SpeechSynthesisUtterance(cleanedBotResponse);
       const voices = window.speechSynthesis.getVoices();
       const raviVoice = voices.find(voice => voice.name === 'Microsoft Ravi - English (India)');
       if (raviVoice) {
