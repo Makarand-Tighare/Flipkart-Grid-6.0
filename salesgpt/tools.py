@@ -14,7 +14,7 @@ from litellm import completion
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from Product_API.Crawler import Get_Related_Post,Get_Product_Details,generate_paragraph, order_product
+#from Product_API.Crawler import Get_Related_Post,Get_Product_Details,generate_paragraph, order_product
 
 from pathlib import Path
 
@@ -285,21 +285,21 @@ def get_related_products(query) :
     else:
         return f"We don't find any relevent products for {query} You can ask something else"
     
-def OrderProduct(query):
-    details = query.split(",")
-    print(details)
-    print("\n\n\n\n\n\n")
-    try:
-        upi_id = details[1].replace(" ","")
-        postal_code = details[2].replace(" ","")
-        if(len(postal_code) == 6):
-            thread = threading.Thread(target=order_product, args=(details[1], details[2], details[0]))
-            thread.start()
-            return f"Your order has been placed succesfully"
-        else : 
-            return f"Please provide valid UPI id and postal code"
-    except:
-        return f"Error occured during product order please try later"
+# def OrderProduct(query):
+#     details = query.split(",")
+#     print(details)
+#     print("\n\n\n\n\n\n")
+#     try:
+#         upi_id = details[1].replace(" ","")
+#         postal_code = details[2].replace(" ","")
+#         if(len(postal_code) == 6):
+#             thread = threading.Thread(target=order_product, args=(details[1], details[2], details[0]))
+#             thread.start()
+#             return f"Your order has been placed succesfully"
+#         else : 
+#             return f"Please provide valid UPI id and postal code"
+#     except:
+#         return f"Error occured during product order please try later"
 
 
 def get_tools(product_catalog):
@@ -336,11 +336,11 @@ def get_tools(product_catalog):
             func=get_related_products,
             description="Use this tool when the ProductSearch function does not find the desired product in the catalog. It helps retrieve a list of related products from external sources like Flipkart, based on the user's preferences or query."
         ),
-        Tool(
-            name="OrderProduct",
-            func=OrderProduct,
-            description=" Use : 'Use this tool to place an order when a user wants to buy or purchase or make a order for a product.' If UPI id & postal code is not provided ask for it strictly.  The **input must always be the product URL followed by UPI id followed by postal code comma seperated**. If required details like the UPI ID or postal code are missing, ask the user for these details. Once the product URL, UPI ID, and postal code are provided, proceed to complete the purchase using this tool. Dont use the upi id or postal code on your own or pass them as blank"
-        )
+        # Tool(
+        #     name="OrderProduct",
+        #     func=OrderProduct,
+        #     description=" Use : 'Use this tool to place an order when a user wants to buy or purchase or make a order for a product.' If UPI id & postal code is not provided ask for it strictly.  The **input must always be the product URL followed by UPI id followed by postal code comma seperated**. If required details like the UPI ID or postal code are missing, ask the user for these details. Once the product URL, UPI ID, and postal code are provided, proceed to complete the purchase using this tool. Dont use the upi id or postal code on your own or pass them as blank"
+        # )
     ]
 
     return tools
