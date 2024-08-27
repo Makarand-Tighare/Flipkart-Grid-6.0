@@ -1,14 +1,30 @@
 import json
 import os
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify,Response
 from flask_cors import CORS
-from Crawler import Get_Order_History,Get_Product_Details,Get_Related_Post,generate_paragraph
+from Crawler import Get_Order_History,Get_Product_Details,Get_Related_Post,generate_paragraph,Call_Customer
 from pathlib import Path
+from twilio.twiml.voice_response import VoiceResponse
+import requests
+from dotenv import load_dotenv
+
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 app = Flask(__name__)
 CORS(app)
+
+
+@app.route('/', methods=['GET'])
+def hello_world():
+    
+    xml_response = '''
+<response>
+    <message>Hello World</message>
+</response>'''
+
+    return Response(xml_response, mimetype='application/xml')
 
 @app.route('/get_product_details', methods=['POST'])
 def get_product_details():
@@ -114,6 +130,67 @@ def get_related_post():
         except Exception as e:
             return jsonify({'error': str(e)}), 500
         
+@app.route('/make_call', methods=['POST'])
+def make_call():
+    data = request.get_json()
+    phone_number = data.get('phone_number')
+
+    if not phone_number:
+        return jsonify({"error": "Phone number is required"}), 400
+    
+    # Call the function with the provided phone number
+    result = Call_Customer(phone_number)
+    
+    return jsonify({"message": "Our sales agent will call you within a minute"}), 200
+
+
+@app.route("/voice", methods=['GET', 'POST'])
+def voice():
+    """Handle incoming calls and gather voice commands."""
+    response = VoiceResponse()
+
+    # Gather voice input from the user
+    gather = response.gather(action='/gather', method='POST', input='speech')
+    gather.say("Please provide your command after the beep.")
+
+    # If no input is received, redirect to /voice
+    response.redirect('/voice')
+
+    return Response(str(response), mimetype='application/xml')
+
+
+@app.route("/gather", methods=['POST'])
+def gather():
+    """Process the voice command and provide a response."""
+    response = VoiceResponse()
+
+    # Retrieve the speech result from the request
+    speech_result = request.form.get('SpeechResult', '')
+
+    print(speech_result)
+
+    api_url = os.getenv('sales_gpt_url')
+
+    # Define the payload
+    payload = {
+        "session_id": "123",
+        "human_say": speech_result
+    }
+
+    print(payload)
+
+    # Send the POST request
+    response = requests.post(api_url, json=payload)
+
+    if response.status_code == 200:
+        api_data = response.json()
+        bot_response = api_data.get('response', 'Sorry, I couldn\'t get a response.')
+        response.say(f"{bot_response}")
+    else:
+        response.say("Sorry, I couldn't fetch the information.")
+
+    return Response(str(response), mimetype='application/xml')
+
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -301,48 +301,71 @@ def OrderProduct(query):
     except:
         return f"Error occured during product order please try later"
 
+def product_search_with_fallback(query, knowledge_base):
+    """
+    Searches for products using the knowledge base.
+    If no products are found, it calls the get_related_products function.
+    """
+    response = knowledge_base.run(query)
+    if "couldn't find specific" in response or not response.strip():
+        # Fallback to get_related_products if no results found
+        response = get_related_products(query)
+        if "amezing products" in response:
+            # Update the product catalog file if related products are found
+            with open(os.path.join(BASE_DIR, 'examples/sample_product_catalog.txt'), 'a', encoding='utf-8') as file:
+                file.write(response)
+    return response
+
+
 
 def get_tools(product_catalog):
-    # query to get_tools can be used to be embedded and relevant tools found
-    # see here: https://langchain-langchain.vercel.app/docs/use_cases/agents/custom_agent_with_plugin_retrieval#tool-retriever
-
-    # we only use four tools for now, but this is highly extensible!
     knowledge_base = setup_knowledge_base(product_catalog)
-    
+
     tools = [
         Tool(
             name="ProductSearch",
-            func=knowledge_base.run,
-            description="useful for when you need to answer questions about product information or services offered, availability and their costs.",
+            func=lambda query: product_search_with_fallback(query, knowledge_base),
+            description=(
+                "Use this tool to search for product information, including features, availability, and pricing details "
+                "based on the user's query. If the specific product is not found in the existing catalog, "
+                "this tool will automatically fetch related products from external sources. This ensures that the user receives information "
+                "even when the desired product is not in the catalog. Use this tool for queries like 'Find a laptop with 16GB RAM' or 'Show me options for ergonomic chairs'."
+            ),
         ),
         Tool(
             name="GeneratePaymentLink",
             func=generate_stripe_payment_link,
-            description="useful to close a transaction with a customer. You need to include product name and quantity and customer name in the query input.",
+            description="Generates a payment link for a transaction. Include product name, quantity, and customer name.",
         ),
         Tool(
             name="SendEmail",
             func=send_email_tool,
-            description="Sends an email based on the query input. The query should specify the recipient, subject, and body of the email.",
+            description="Sends an email. Query must specify the recipient, subject, and body.",
         ),
         Tool(
             name="SendCalendlyInvitation",
             func=generate_calendly_invitation_link,
-            description='''Useful for when you need to create invite for a personal meeting in Sleep Heaven shop. 
-            Sends a calendly invitation based on the query input.''',
+            description="Creates a Calendly invitation for scheduling meetings based on user input.",
         ),
         Tool(
             name="GetRelatedProducts",
             func=get_related_products,
-            description="Use this tool when the ProductSearch function does not find any product or the desired product is not in the catalog. It helps retrieve a list of related products from external sources like Flipkart, based on the user's preferences or query."
+            description=(
+                "Use this tool to find related products from external sources when the specific product the user is looking for is not available in the catalog. "
+                "This tool scrapes external sources to find similar products based on the user's preferences. "
+                "This is useful for queries such as 'Find more options for wireless headphones' or 'Show me some alternatives to gaming laptops' or 'recommend me some laptops' etc...."
+            ),
         ),
         Tool(
             name="OrderProduct",
             func=OrderProduct,
-            description=" Use : 'Use this tool to place an order when a user wants to buy or purchase or make a order for a product.' If UPI id & postal code is not provided ask for it strictly.  The **input must always be the product URL followed by UPI id followed by postal code comma seperated**. If required details like the UPI ID or postal code are missing, ask the user for these details. Once the product URL, UPI ID, and postal code are provided, proceed to complete the purchase using this tool. Dont use the upi id or postal code on your own or pass them as blank"
+            description=(
+                "Use this tool to place an order for a product. The input must include the product URL, UPI ID, and postal code, "
+                "all separated by commas. This is specifically for completing a purchase when the user provides all the required "
+                "details. If any detail is missing, ask the user for the necessary information. Example input: "
+                "'Place an order for https://example.com/product, 1234567890@upi, 123456'."
+            ),
         )
     ]
 
     return tools
-
-

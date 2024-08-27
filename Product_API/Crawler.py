@@ -6,10 +6,15 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
 import time
 import random
 import os
-from selenium.webdriver.chrome.options import Options
+from twilio.rest import Client
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 def generate_paragraph(info):
     # Initialize the paragraph as an empty string
@@ -419,4 +424,20 @@ def order_product(upi_id, pin_code, product_url):
         time.sleep(5)
         driver.quit()
 
-# order_product('7387026440@ibl', '440024', 'https://www.flipkart.com/ajn-flair-ezee-click-ball-pen/p/itm525416930e650?pid=PENGHSA8UGJVQKNW&cmpid=product.share.pp&_refId=PP.cc6bb72a-9e89-4b7e-b8a3-1d8d3e43dd2b.PENGHSA8UGJVQKNW&_appId=WA')
+def Call_Customer(Phone_number):
+    account_sid = os.getenv('account_sid')
+    auth_token = os.getenv('auth_token')
+    server_phone_number = os.getenv('phone_no')
+    webhook_url = os.getenv('webhook_url')  # URL where the TwiML is hosted
+
+    client = Client(account_sid, auth_token)
+
+    call = client.calls.create(
+        url=webhook_url,  # Point to the URL of your Flask app
+        to=Phone_number,
+        from_=server_phone_number
+    )
+
+    print(call.sid)
+
+# order_product('7387026440@ibl', '440024', 'https://www.flipkart.com/samsung-galaxy-f15-5g-groovy-violet-128-gb/p/itmd0aaf528709de?pid=MOBGYBAVSDFYZFNY&lid=LSTMOBGYBAVSDFYZFNY0YSXRQ&marketplace=FLIPKART&fm=neo%2Fmerchandising&iid=M_72128129-2b77-4da5-8592-74017f1f75c2_1_1BUWY8OBA8L9_MC.MOBGYBAVSDFYZFNY&ppt=pp&ppn=pp&ssid=v3y8vuwea80000001724485748000&otracker=clp_pmu_v2_Latest%2BSamsung%2Bmobiles%2B_2_1.productCard.PMU_V2_SAMSUNG%2BGalaxy%2BF15%2B5G%2B%2528Groovy%2BViolet%252C%2B128%2BGB%2529_samsung-mobile-store_MOBGYBAVSDFYZFNY_neo%2Fmerchandising_1&otracker1=clp_pmu_v2_PINNED_neo%2Fmerchandising_Latest%2BSamsung%2Bmobiles%2B_LIST_productCard_cc_2_NA_view-all&cid=MOBGYBAVSDFYZFNY')
